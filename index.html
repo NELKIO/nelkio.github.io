@@ -2,13 +2,230 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Influence Web — «Влияние» в браузере</title>
-    <meta name="description" content="Пошаговая стратегия о захвате территории в браузере — фанатский ремейк «Влияния»." />
-    <link rel="canonical" href="https://nelkio.github.io/influence-web/" />
-    <meta http-equiv="refresh" content="0; url=/influence-web/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>NELKIO — проекты</title>
+    <meta name="description" content="Проекты NELKIO: браузерные игры и эксперименты. Influence Web — «Влияние» в браузере." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="NELKIO — проекты" />
+    <meta property="og:description" content="Браузерные игры и эксперименты." />
+    <meta property="og:url" content="https://nelkio.github.io/" />
+    <meta property="og:image" content="https://nelkio.github.io/influence-web/og.png" />
+    <meta name="theme-color" content="#0b0c0f" />
+    <link rel="icon" href="https://nelkio.github.io/influence-web/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #0b0c0f;
+        --surface: #15171c;
+        --surface-2: #1b1e24;
+        --hair: rgba(255, 255, 255, 0.08);
+        --hair-2: rgba(255, 255, 255, 0.14);
+        --text: #eceef2;
+        --muted: #8d939e;
+        --blue: #3f8cff;
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        background:
+          radial-gradient(70% 50% at 50% 0%, rgba(63, 140, 255, 0.08), transparent 70%),
+          var(--bg);
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: calc(env(safe-area-inset-top, 0px) + 56px) 20px calc(env(safe-area-inset-bottom, 0px) + 40px);
+      }
+
+      header {
+        margin-bottom: 36px;
+      }
+
+      h1 {
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: clamp(36px, 7vw, 56px);
+        letter-spacing: -0.03em;
+        margin: 0;
+      }
+
+      header p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 17px;
+        font-weight: 500;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 760px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 280px;
+        border-radius: 22px;
+        border: 1px solid var(--hair);
+        background: var(--surface);
+        color: inherit;
+        text-decoration: none;
+        overflow: hidden;
+        transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: var(--hair-2);
+        background: var(--surface-2);
+      }
+
+      .card:active {
+        transform: scale(0.99);
+      }
+
+      .card:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
+      }
+
+      .cover {
+        height: 168px;
+        background-size: cover;
+        background-position: center;
+        border-bottom: 1px solid var(--hair);
+      }
+
+      .cover.github {
+        display: grid;
+        place-items: center;
+        background: radial-gradient(60% 80% at 50% 40%, #1f232b, #121419);
+      }
+
+      .cover.github svg {
+        width: 76px;
+        height: 76px;
+        fill: var(--text);
+        opacity: 0.92;
+      }
+
+      .body {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px 20px;
+        margin-top: auto;
+      }
+
+      .title {
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        letter-spacing: -0.01em;
+      }
+
+      .desc {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.45;
+      }
+
+      .go {
+        flex: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px -12px var(--blue);
+      }
+
+      .card.alt .go {
+        background: var(--surface-2);
+        border: 1px solid var(--hair-2);
+        box-shadow: none;
+      }
+
+      .go svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      footer {
+        margin-top: 40px;
+        color: #5c626d;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    </style>
   </head>
-  <body style="background:#0b0c0f;color:#eceef2;font-family:system-ui,sans-serif;padding:32px">
-    <a href="/influence-web/" style="color:#3f8cff">Influence Web — играть в браузере</a>
+  <body>
+    <main>
+      <header>
+        <h1>NELKIO</h1>
+        <p>Проекты и эксперименты</p>
+      </header>
+      <div class="grid" id="grid"></div>
+      <footer>© NELKIO</footer>
+    </main>
+
+    <script>
+      // Add new projects here: they appear as cards before the GitHub card.
+      const PROJECTS = [
+        {
+          title: 'Influence Web',
+          desc: '«Влияние» в браузере: стратегия о захвате территории. Боты, дуэли, карта дня.',
+          url: 'https://nelkio.github.io/influence-web/',
+          cover: 'https://nelkio.github.io/influence-web/og.png',
+        },
+      ];
+      const GITHUB = { title: 'GitHub', desc: 'Код и все проекты', url: 'https://github.com/NELKIO' };
+
+      const arrow =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      const githubMark =
+        '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+
+      const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      const card = (p, alt, cover) =>
+        `<a class="card${alt ? ' alt' : ''}" href="${esc(p.url)}">${cover}<div class="body"><div><div class="title">${esc(p.title)}</div><div class="desc">${esc(p.desc)}</div></div><span class="go">${arrow}</span></div></a>`;
+
+      document.getElementById('grid').innerHTML =
+        PROJECTS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}')"></div>`)).join('') +
+        card(GITHUB, true, `<div class="cover github">${githubMark}</div>`);
+    </script>
+    <noscript>
+      <p style="padding: 0 20px"><a href="https://nelkio.github.io/influence-web/">Influence Web</a> · <a href="https://github.com/NELKIO">GitHub</a></p>
+    </noscript>
   </body>
 </html>
