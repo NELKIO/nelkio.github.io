@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nelkio.github.io/influence-web/sitemap.xml
+Sitemap: https://nelkio.github.io/sitemap.xml
