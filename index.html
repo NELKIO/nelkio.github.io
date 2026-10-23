@@ -3,13 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>NELKIO — проекты</title>
-    <meta name="description" content="Проекты NELKIO: браузерные игры и эксперименты. Influence Web — «Влияние» в браузере." />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="NELKIO — проекты" />
-    <meta property="og:description" content="Браузерные игры и эксперименты." />
+    <title>Лука Дуванов (NELKIO) — ML, анализ данных и проекты</title>
+    <meta name="description" content="Лука Дуванов (NELKIO), студент ПМИ ФКН ВШЭ: ML и анализ данных. Призёр ВСОШ по ИИ, трижды диплом DANO, победитель 4 хакатонов DANO. Проекты и игры." />
+    <meta name="author" content="Лука Дуванов" />
+    <link rel="canonical" href="https://nelkio.github.io/" />
+    <meta property="og:type" content="profile" />
+    <meta property="profile:first_name" content="Лука" />
+    <meta property="profile:last_name" content="Дуванов" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="NELKIO" />
+    <meta property="og:title" content="Лука Дуванов (NELKIO) — ML, анализ данных и проекты" />
+    <meta property="og:description" content="Студент ПМИ ФКН ВШЭ. Призёр ВСОШ по ИИ, трижды диплом DANO, победитель 4 хакатонов DANO. Проекты и эксперименты." />
     <meta property="og:url" content="https://nelkio.github.io/" />
-    <meta property="og:image" content="https://nelkio.github.io/influence-web/og.png" />
+    <meta property="og:image" content="https://nelkio.github.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Лука Дуванов: ВСОШ, 3× DANO, 4× хакатоны, преподавание" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://nelkio.github.io/og.png" />
     <meta name="google-site-verification" content="sBDF4QuI3c0VnsnnlpVagbPLyioW5jRaXDjcs0wuUSE" />
     <meta name="yandex-verification" content="b2a7fdac9ae3e78f" />
     <meta name="theme-color" content="#0b0c0f" />
@@ -24,12 +35,25 @@
         "url": "https://nelkio.github.io/",
         "author": {
           "@type": "Person",
-          "name": "NELKIO",
+          "name": "Лука Дуванов",
+          "alternateName": "NELKIO",
           "url": "https://nelkio.github.io/",
-          "sameAs": ["https://github.com/NELKIO"]
+          "sameAs": ["https://github.com/NELKIO"],
+          "description": "Студент ПМИ ФКН ВШЭ, ML и анализ данных",
+          "affiliation": { "@type": "CollegeOrUniversity", "name": "НИУ ВШЭ, факультет компьютерных наук" },
+          "knowsAbout": ["Машинное обучение", "Анализ данных", "Компьютерное зрение", "NLP", "Агентные системы"],
+          "award": [
+            "Призёр заключительного этапа ВСОШ по искусственному интеллекту, 2026",
+            "Победитель олимпиады DANO (Высшая проба, анализ данных), 2023 и 2024",
+            "Призёр олимпиады DANO, 2025",
+            "Победитель олимпиады DLS, 2026"
+          ]
         },
         "hasPart": [{ "@type": "VideoGame", "name": "Influence Web", "url": "https://nelkio.github.io/influence-web/" }]
       }
+    </script>
+    <script>
+      document.documentElement.classList.add('js');
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -200,6 +224,515 @@
         height: 22px;
       }
 
+      /* About: intro, stats and a timeline with the line down the middle */
+      .about {
+        margin-top: 88px;
+        --gold: #f2c14e;
+        --holo: linear-gradient(120deg, #67e8f9, #a78bfa 50%, #ff6ad5);
+      }
+
+      .eyebrow {
+        margin-bottom: 10px;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .about h2 {
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: clamp(26px, 4.6vw, 36px);
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+
+      .lead {
+        margin: 14px 0 0;
+        max-width: 640px;
+        color: var(--muted);
+        font-size: 17px;
+        font-weight: 500;
+        line-height: 1.55;
+      }
+
+      .lead b {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        margin: 28px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      @media (min-width: 360px) {
+        .stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 760px) {
+        .stats {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .stats strong {
+          font-size: 22px;
+          white-space: nowrap;
+        }
+      }
+
+      .stats li {
+        position: relative;
+        padding: 18px 16px 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(242, 193, 78, 0.28);
+        background:
+          radial-gradient(120% 90% at 0% 0%, rgba(242, 193, 78, 0.16), transparent 60%),
+          var(--surface);
+        box-shadow: 0 16px 40px -28px rgba(242, 193, 78, 0.6);
+      }
+
+      /* teaching tile in the same blue as teaching cards in the timeline */
+      .stats li.teach {
+        border-color: rgba(63, 140, 255, 0.4);
+        background:
+          radial-gradient(120% 90% at 0% 0%, rgba(63, 140, 255, 0.2), transparent 60%),
+          var(--surface);
+        box-shadow: 0 16px 40px -28px rgba(63, 140, 255, 0.7);
+      }
+
+      .stats li.teach strong {
+        background-image: linear-gradient(100deg, #e3edff, #6fa8ff 70%);
+      }
+
+      .stats li.win {
+        border-color: rgba(52, 211, 153, 0.4);
+        background:
+          radial-gradient(120% 90% at 0% 0%, rgba(52, 211, 153, 0.18), transparent 60%),
+          var(--surface);
+        box-shadow: 0 16px 40px -28px rgba(52, 211, 153, 0.7);
+      }
+
+      .stats li.win strong {
+        background-image: linear-gradient(100deg, #dcfff1, #34d399 70%);
+      }
+
+      /* VSOSH stands out: iridescent border, tint and shimmering title */
+      .stats li.vsosh,
+      .item.vsosh {
+        border-color: transparent;
+        background:
+          radial-gradient(120% 90% at 0% 0%, rgba(255, 106, 213, 0.16), transparent 60%) padding-box,
+          linear-gradient(var(--surface), var(--surface)) padding-box,
+          var(--holo) border-box;
+      }
+
+      .stats li.vsosh {
+        box-shadow: 0 16px 44px -24px rgba(255, 106, 213, 0.75);
+      }
+
+      .stats li.vsosh strong {
+        background-image: linear-gradient(100deg, #8bf0ff, #c4a1ff, #ff8ade, #8bf0ff);
+        background-size: 300% 100%;
+        animation: shimmer 6s linear infinite;
+      }
+
+      @keyframes shimmer {
+        to {
+          background-position: 300% 0;
+        }
+      }
+
+      .stats strong {
+        display: block;
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+        background: linear-gradient(100deg, #fff3cf, var(--gold) 70%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .stats li > span {
+        display: block;
+        margin-top: 6px;
+        color: #b7bcc6;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+
+      .tl {
+        position: relative;
+        margin: 56px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .tl-line,
+      .tl-fill {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        transform: translateX(-50%);
+        border-radius: 2px;
+      }
+
+      .tl-line {
+        bottom: 0;
+        background: var(--hair-2);
+      }
+
+      .tl-fill {
+        height: 0;
+        background: linear-gradient(var(--blue), #8ab8ff);
+        box-shadow: 0 0 14px rgba(63, 140, 255, 0.55);
+      }
+
+      .year {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin: 8px 0 28px;
+      }
+
+      .year span {
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--hair-2);
+        background: var(--bg);
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .year.now span {
+        border-color: var(--blue);
+        color: #fff;
+        background: var(--blue);
+      }
+
+      .item {
+        position: relative;
+        width: calc(50% - 36px);
+        margin-bottom: 28px;
+        padding: 16px 18px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--hair);
+        background: var(--surface);
+      }
+
+      .item.r {
+        margin-left: auto;
+      }
+
+      .item:last-child {
+        margin-bottom: 0;
+      }
+
+      /* accent cards: gold for major wins, green for hackathons, blue for teaching, violet for study */
+      .item.top {
+        --acc: var(--gold);
+        --acc-rgb: 242, 193, 78;
+      }
+
+      .item.win {
+        --acc: #34d399;
+        --acc-rgb: 52, 211, 153;
+      }
+
+      .item.camp {
+        --acc: #ff6b6b;
+        --acc-rgb: 255, 107, 107;
+      }
+
+      .item.teach {
+        --acc: var(--blue);
+        --acc-rgb: 63, 140, 255;
+      }
+
+      .item.study {
+        --acc: #a78bfa;
+        --acc-rgb: 167, 139, 250;
+      }
+
+      .item.top,
+      .item.teach,
+      .item.study {
+        border-color: rgba(var(--acc-rgb), 0.4);
+        background:
+          radial-gradient(90% 120% at 50% 0%, rgba(var(--acc-rgb), 0.15), transparent 70%),
+          var(--surface);
+      }
+
+      .item.win,
+      .item.camp {
+        border-color: rgba(var(--acc-rgb), 0.4);
+      }
+
+      .item.top h3,
+      .item.teach h3,
+      .item.study h3 {
+        color: color-mix(in srgb, var(--acc) 16%, #fff);
+      }
+
+      /* two branches at the same moment: one dot, a stem to each card */
+      .pair {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 28px;
+      }
+
+      .pair .item {
+        margin: 0;
+      }
+
+      .pair .item::after {
+        content: '';
+        position: absolute;
+        top: 27px;
+        width: 31px;
+        height: 2px;
+        background: var(--hair-2);
+        transition: background 0.3s;
+      }
+
+      .pair .item.l::after {
+        right: -31px;
+      }
+
+      .pair .item.r::after {
+        left: -31px;
+      }
+
+      .pair .item.on::after {
+        background: var(--blue);
+      }
+
+      .item.l {
+        text-align: right;
+      }
+
+      .item::before {
+        content: '';
+        position: absolute;
+        top: 22px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 2px solid var(--hair-2);
+        transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      }
+
+      .item.l::before {
+        right: -45px;
+      }
+
+      .item.r::before {
+        left: -45px;
+      }
+
+      .item.on::before {
+        border-color: var(--blue);
+        background: var(--blue);
+        box-shadow: 0 0 0 4px rgba(63, 140, 255, 0.18);
+      }
+
+      .item.top.on::before,
+      .item.win.on::before,
+      .item.camp.on::before,
+      .item.teach.on::before,
+      .item.study.on::before {
+        border-color: var(--acc);
+        background: var(--acc);
+        box-shadow: 0 0 0 4px rgba(var(--acc-rgb), 0.18), 0 0 16px rgba(var(--acc-rgb), 0.5);
+      }
+
+      .item time {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .item h3 {
+        margin: 6px 0 0;
+        font-family: 'Unbounded', 'Manrope', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+      }
+
+      .item p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .item.l .tags {
+        justify-content: flex-end;
+      }
+
+      .tag {
+        padding: 3px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--hair-2);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .tag.gold {
+        border-color: rgba(242, 193, 78, 0.45);
+        color: var(--gold);
+        background: rgba(242, 193, 78, 0.08);
+      }
+
+      .tag.blue {
+        border-color: rgba(63, 140, 255, 0.5);
+        color: #8ab8ff;
+        background: rgba(63, 140, 255, 0.1);
+      }
+
+      .item.vsosh h3 {
+        color: #ffe9f8;
+      }
+
+      .item.vsosh.on::before {
+        border-color: #ff6ad5;
+        background: var(--holo);
+        box-shadow: 0 0 0 4px rgba(255, 106, 213, 0.2), 0 0 18px rgba(255, 106, 213, 0.6);
+      }
+
+      .tag.holo {
+        border-color: rgba(255, 106, 213, 0.5);
+        color: #ff9be6;
+        background: rgba(255, 106, 213, 0.1);
+      }
+
+      .item.study {
+        border-color: rgba(var(--acc-rgb), 0.6);
+        background:
+          radial-gradient(90% 120% at 50% 0%, rgba(var(--acc-rgb), 0.24), transparent 70%),
+          var(--surface);
+      }
+
+      .tag.violet {
+        border-color: rgba(167, 139, 250, 0.5);
+        color: #c4b5fd;
+        background: rgba(167, 139, 250, 0.12);
+      }
+
+      .tag.green {
+        border-color: rgba(52, 211, 153, 0.45);
+        color: #5ee3b4;
+        background: rgba(52, 211, 153, 0.08);
+      }
+
+      .tag.red {
+        border-color: rgba(255, 107, 107, 0.45);
+        color: #ff8a80;
+        background: rgba(255, 107, 107, 0.08);
+      }
+
+      /* hidden only when JS is there to reveal it */
+      .js .item {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+
+      .js .item.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (max-width: 759px) {
+        .tl-line,
+        .tl-fill {
+          left: 7px;
+        }
+
+        .year {
+          justify-content: flex-start;
+          margin-left: 0;
+        }
+
+        .item,
+        .item.l,
+        .item.r {
+          width: auto;
+          margin-left: 32px;
+          text-align: left;
+        }
+
+        .item.l::before,
+        .item.r::before {
+          left: -34px;
+          right: auto;
+        }
+
+        .item.l .tags {
+          justify-content: flex-start;
+        }
+
+        .pair {
+          flex-direction: column;
+          gap: 28px;
+          align-items: stretch;
+        }
+
+        .pair .item,
+        .pair .item.r {
+          margin-left: 32px;
+        }
+
+        .pair .item::after {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .js .item {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+
+        .stats li.vsosh strong {
+          animation: none;
+        }
+      }
+
+      /* keeps hyphenated words whole without a non-breaking hyphen, so search sees a normal "-" */
+      .nw {
+        white-space: nowrap;
+      }
+
       footer {
         margin-top: 40px;
         color: #5c626d;
@@ -215,6 +748,133 @@
         <p>Проекты и эксперименты</p>
       </header>
       <div class="grid" id="grid"></div>
+
+      <section class="about" id="about">
+        <div class="eyebrow">Обо мне</div>
+        <h2>Лука Дуванов</h2>
+        <p class="lead">
+          Учусь на ПМИ ФКН ВШЭ.<br />
+          Специализируюсь на ML и анализе данных: шарю за EDA, классический ML, CV, NLP и агентские системы.<br />
+          Выигрывал олимпиады и хакатоны по анализу данных и ИИ, сейчас фокусируюсь на учёбе и преподавании.
+        </p>
+
+        <ul class="stats">
+          <li class="vsosh"><strong>ВСОШ</strong><span>Призёр финала по искусственному интеллекту</span></li>
+          <li><strong>3×&nbsp;DANO</strong><span>Дипломы три года подряд, каждый раз абсолют тура</span></li>
+          <li class="win"><strong>4× хакатоны</strong><span>Победитель хакатонов DANO: Москва, СПб&nbsp;×2, Иннополис</span></li>
+          <li class="teach"><strong>Преподаю</strong><span><span class="nw">Т-Образование</span>, сборная Москвы по ИИ, 3 потока ментором в DLS</span></li>
+        </ul>
+
+        <ol class="tl" id="tl">
+          <li class="tl-line" aria-hidden="true"></li>
+          <li class="tl-fill" aria-hidden="true"></li>
+
+          <li class="year now"><span>Сейчас</span></li>
+          <li class="pair">
+            <div class="item l teach">
+              <time>С сентября 2026</time>
+              <h3>Кружок <span class="nw">Т-Образования</span></h3>
+              <p>Подготовка школьников к ВСОШ по ИИ.</p>
+            </div>
+            <div class="item r teach">
+              <time>С сентября 2026</time>
+              <h3>Сборная Москвы по ИИ</h3>
+              <p>Подготовка школьников к ВСОШ по ИИ.</p>
+            </div>
+          </li>
+
+          <li class="year"><span>2026</span></li>
+          <li class="item l study">
+            <time>Лето 2026</time>
+            <h3>Студент ПМИ ФКН ВШЭ</h3>
+            <p>Окончил школу ЦПМ и поступил на прикладную математику и информатику.</p>
+            <div class="tags"><span class="tag violet">Выпуск 2030</span></div>
+          </li>
+          <li class="item r top">
+            <time>Июнь 2026</time>
+            <h3>1 место на Летней школе ФКН</h3>
+            <p>Продвинутый трек от Сбера: разрабатывали <span class="nw">ИИ-агента</span>.</p>
+            <div class="tags"><span class="tag gold">1 место в треке Сбера</span></div>
+          </li>
+          <li class="item l vsosh">
+            <time>Март 2026</time>
+            <h3>Призёр финала ВСОШ по искусственному интеллекту</h3>
+            <p>Заключительный этап Всероссийской олимпиады школьников.</p>
+            <div class="tags"><span class="tag holo">Призёр ВСОШ</span><span class="tag holo">12-е место на практическом туре</span></div>
+          </li>
+          <li class="item r top">
+            <time>Февраль 2026</time>
+            <h3>Победитель олимпиады DLS</h3>
+            <p>Олимпиада Deep Learning School по машинному обучению от ФПМИ МФТИ.</p>
+            <div class="tags"><span class="tag gold">Победитель</span></div>
+          </li>
+
+          <li class="year"><span>2025</span></li>
+          <li class="item l top">
+            <time>Декабрь 2025</time>
+            <h3>Абсолютный победитель командного тура DANO</h3>
+            <p>Третий диплом DANO подряд, по итогам олимпиады призёр.</p>
+            <div class="tags"><span class="tag gold">Абсолют</span><span class="tag gold">Призёр</span></div>
+          </li>
+          <li class="item r teach">
+            <time>Весна 2025 – август 2026</time>
+            <h3>Ментор в Deep Learning School</h3>
+            <p>Вёл и проверял проекты на стыке CV и NLP.</p>
+            <div class="tags"><span class="tag blue">3 потока</span></div>
+          </li>
+          <li class="item l win">
+            <time>Апрель 2025</time>
+            <h3>Хакатон DANO в ИТМО</h3>
+            <p>Санкт-Петербург.</p>
+            <div class="tags"><span class="tag green">Победитель</span></div>
+          </li>
+          <li class="item r win">
+            <time>Март 2025</time>
+            <h3>Хакатон DANO в Москве</h3>
+            <p>Российская экономическая школа.</p>
+            <div class="tags"><span class="tag green">Победитель</span></div>
+          </li>
+
+          <li class="year"><span>2024</span></li>
+          <li class="item l top">
+            <time>Декабрь 2024</time>
+            <h3>Победитель DANO</h3>
+            <p>Второй год подряд, абсолютный победитель командного тура.</p>
+            <div class="tags"><span class="tag gold">Победитель</span><span class="tag gold">Абсолют</span></div>
+          </li>
+          <li class="item r win">
+            <time>Сентябрь 2024</time>
+            <h3>Хакатон DANO в ВШЭ Санкт-Петербург</h3>
+            <div class="tags"><span class="tag green">Победитель</span></div>
+          </li>
+          <li class="item l win">
+            <time>Апрель 2024</time>
+            <h3>Хакатон DANO в Иннополисе</h3>
+            <div class="tags"><span class="tag green">Победитель</span></div>
+          </li>
+
+          <li class="year"><span>2023</span></li>
+          <li class="item r top">
+            <time>Декабрь 2023</time>
+            <h3>Победитель DANO</h3>
+            <p>Олимпиада по анализу данных «Высшая проба». Абсолютный победитель личного тура.</p>
+            <div class="tags"><span class="tag gold">Победитель</span><span class="tag gold">Абсолют</span></div>
+          </li>
+          <li class="item l camp">
+            <time>Июнь – июль 2023</time>
+            <h3>Летние школы по анализу данных</h3>
+            <p>ФКН ВШЭ и выездная школа «Олимпикс».</p>
+            <div class="tags"><span class="tag red">2 смены</span></div>
+          </li>
+          <li class="item r camp">
+            <time>Май 2023 · Июль 2024 · Май 2025</time>
+            <h3>Смена кодИИм</h3>
+            <p>Здесь я впервые познакомился с ИИ, в 8 классе, и потом возвращался ещё дважды.</p>
+            <div class="tags"><span class="tag red">3 смены</span></div>
+          </li>
+        </ol>
+      </section>
+
       <footer>© NELKIO</footer>
     </main>
 
@@ -229,6 +889,27 @@
         },
       ];
       const GITHUB = { title: 'GitHub', desc: 'Код и все проекты', url: 'https://github.com/NELKIO' };
+      // DANO final project decks (PDF in /dano), newest first: they go in their own row after GitHub.
+      const DECKS = [
+        {
+          title: 'Финал DANO’25',
+          desc: 'Проект: влияет ли цена квадратного метра на задержки сдачи новостроек в Новой Москве. Презентация, PDF',
+          url: 'dano/dano-2025.pdf',
+          cover: 'dano/dano-2025.jpg',
+          pos: 'center',
+          fit: 'contain', // the whole slide, framed by its own light-gray background
+          bg: '#f6f6f6',
+        },
+        {
+          title: 'Финал DANO’24',
+          desc: 'Проект на данных Т-Банка: как активность клиента влияет на повторные заказы в «Городе». Презентация, PDF',
+          url: 'dano/dano-2024.pdf',
+          cover: 'dano/dano-2024.jpg',
+          pos: 'center',
+          fit: 'contain', // nothing cropped; a few px of white slide background on the sides
+          bg: '#fff',
+        },
+      ];
 
       const arrow =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -241,10 +922,48 @@
 
       document.getElementById('grid').innerHTML =
         PROJECTS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}')"></div>`)).join('') +
-        card(GITHUB, true, `<div class="cover github">${githubMark}</div>`);
+        card(GITHUB, true, `<div class="cover github">${githubMark}</div>`) +
+        DECKS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}');background-position:${p.pos};background-size:${p.fit || 'cover'};background-repeat:no-repeat;background-color:${p.bg || 'transparent'}"></div>`)).join('');
+
+      // Timeline: cards fade in, the line fills up to the reading point, dots light up as it passes them.
+      const tl = document.getElementById('tl');
+      const fill = tl.querySelector('.tl-fill');
+      const items = [...tl.querySelectorAll('.item')];
+
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }),
+        { rootMargin: '0px 0px -10% 0px' },
+      );
+      items.forEach((el) => io.observe(el));
+
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        // at the very bottom the last cards can't reach the reading point, so fill the rest
+        const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+        const mark = atEnd ? innerHeight : innerHeight * 0.6;
+        const box = tl.getBoundingClientRect();
+        fill.style.height = Math.max(0, Math.min(box.height, mark - box.top)) + 'px';
+        items.forEach((el) => el.classList.toggle('on', el.getBoundingClientRect().top + 28 < mark));
+      };
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      };
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll);
+      update();
     </script>
     <noscript>
-      <p style="padding: 0 20px"><a href="https://nelkio.github.io/influence-web/">Influence Web</a> · <a href="https://github.com/NELKIO">GitHub</a></p>
+      <p style="padding: 0 20px"><a href="https://nelkio.github.io/influence-web/">Influence Web</a> · <a href="https://github.com/NELKIO">GitHub</a> · <a href="dano/dano-2025.pdf">Финал DANO’25</a> · <a href="dano/dano-2024.pdf">Финал DANO’24</a></p>
     </noscript>
   </body>
 </html>
