@@ -116,6 +116,32 @@
     draw(10);
   };
 
+  // ---------- производная ошибки по наклону ----------
+  S.tangent = root => {
+    const bar = controls(root), ps = panels(root), n = note(root);
+    const xs = sm.train[0], ys = sm.train[1], b = sm.b;
+    const J = w => 0.5 * mean(xs.map((x, i) => (w * x + b - ys[i]) ** 2));
+    const dJ = w => mean(xs.map((x, i) => (w * x + b - ys[i]) * x));
+    const P = mpgPlot(ps, { w: 608, h: 315, title: 'Прямая на данных train' });
+    P.dots(xs, ys, { fill: C.gray, opacity: .5, layer: P.back });
+    const ws = range(-11, -4.9, 120), jmax = Math.max(J(-11), J(-4.9));
+    const Q = plot(ps, { w: 608, h: 315, x: [-11, -4.9], y: [0, jmax * 1.05], title: 'Ошибка J при разных w', xl: 'наклон w', yl: 'J', xf: v => fmt(v, 0) });
+    Q.line(ws, ws.map(J), { stroke: C.ink, layer: Q.back });
+    Q.mark(sm.w, J(sm.w), { fill: C.green, r: 6, layer: Q.back });
+    function draw(w) {
+      P.clear(); Q.clear();
+      P.line([1.4, 5.4], [b + w * 1.4, b + w * 5.4], { stroke: C.orange, 'stroke-width': 3 });
+      const k = dJ(w), j = J(w), dw = 0.9;
+      Q.line([w - dw, w + dw], [j - k * dw, j + k * dw], { stroke: C.orange, 'stroke-width': 2.5 });
+      Q.mark(w, j);
+      const dir = Math.abs(k) < 0.3 ? 'почти ноль — мы у минимума' : k < 0 ? 'меньше нуля: J уменьшится, если увеличить w' : 'больше нуля: J уменьшится, если уменьшить w';
+      n.innerHTML = `w = <b>${fmt(w, 1)}</b> · J = <b>${fmt(j, 1)}</b> · производная dJ/dw = <b>${fmt(k, 1)}</b> — ${dir}. Минимум: w = ${fmt(sm.w)}`;
+    }
+    slider(bar, { label: 'Наклон w', min: -11, max: -5, step: 0.1, value: -10, fmt: v => fmt(v, 1), on: draw });
+    legend(bar, [{ color: C.orange, label: 'касательная: её наклон — производная' }, { color: C.green, label: 'минимум', dot: 1 }]);
+    draw(-10);
+  };
+
   // ---------- градиентный спуск ----------
   S.gd = root => {
     const bar = controls(root), ps = panels(root), n = note(root);
@@ -240,14 +266,37 @@
 
   // ---------- коррелирующие признаки ----------
   S.collinear = root => {
-    const c = D.collinear, ps = panels(root);
-    [['ols', 'МНК без штрафа', C.orange], ['ridge', `Ridge, alpha = ${c.alpha}`, C.blue]].forEach(([k, title, col]) => {
-      const P = plot(ps, { w: 608, h: 350, x: [-8, 0], y: [-5, 1], title, xl: 'вес при массе', yl: 'вес при объёме двигателя' });
-      P.seg(-8, 0, 0, 0, { stroke: '#c5ccd4', layer: P.back });
-      P.dots(c[k].map(v => v[0]), c[k].map(v => v[1]), { fill: col, r: 5, opacity: .7 });
+    const c = D.collinear, ps = panels(root, 'p32');
+    let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const sd = a => { const m = mean(a); return Math.sqrt(mean(a.map(v => (v - m) ** 2))); };
+    const rows = [];
+    [['ols', 'МНК без штрафа', C.orange], ['ridge', `Ridge, alpha = ${c.alpha}`, C.blue]].forEach(([k, name, col]) => {
+      const w1 = c[k].map(v => v[0]), w2 = c[k].map(v => v[1]);
+      rows.push({ head: name, col });
+      rows.push({ label: 'вес массы', vals: w1, col });
+      rows.push({ label: 'вес объёма', vals: w2, col });
+      rows.push({ label: 'сумма двух весов', vals: w1.map((v, i) => v + w2[i]), col, bold: true });
     });
-    note(root).innerHTML = `Разброс весов по 40 бутстреп-выборкам train: МНК — <b>${fmt(c.coef_sd_ols[0])}</b>, Ridge — <b>${fmt(c.coef_sd_ridge[0])}</b>. Разброс прогнозов на validation: <b>${fmt(c.pred_sd_ols)}</b> и <b>${fmt(c.pred_sd_ridge)}</b> mpg. RMSE validation: ${fmt(c.val_rmse_ols)} и ${fmt(c.val_rmse_ridge)} mpg.`;
-    caption(root, `Auto MPG · признаки стандартизованы по train · корреляция массы и объёма на train: ${fmt(c.corr)} · alpha = ${c.alpha} задан заранее для демонстрации, без подбора.`);
+    const H = 390, P = plot(ps, { w: 760, h: H, x: [-8, 0.6], y: [0, rows.length], yt: [], xl: 'значение веса (признаки стандартизованы), mpg', xn: 8, grid: false, m: { l: 190, r: 96, t: 6 } });
+    P.seg(0, 0, 0, rows.length, { stroke: '#c5ccd4', layer: P.back });
+    rows.forEach((r, i) => {
+      const y = rows.length - i - 0.5;
+      if (r.head) { h('text', { x: 4, y: P.sy(y) + 6, 'font-size': 17, 'font-weight': 600, fill: r.col }, P.svg, r.head); return; }
+      h('text', { x: P.m.l - 12, y: P.sy(y) + 5, 'text-anchor': 'end', 'font-size': 16, fill: C.ink, 'font-weight': r.bold ? 600 : 400 }, P.svg, r.label);
+      const lo = Math.min(...r.vals), hi = Math.max(...r.vals);
+      P.seg(lo, y, hi, y, { stroke: r.col, 'stroke-opacity': .35, 'stroke-width': 8, 'stroke-linecap': 'round', layer: P.back });
+      P.dots(r.vals, r.vals.map(() => y + (rnd() - 0.5) * 0.36), { fill: r.col, r: 3.2, opacity: .85 });
+      h('text', { x: P.m.l + P.pw + 10, y: P.sy(y) + 5, 'font-size': 15, fill: C.muted }, P.svg, `разброс ${fmt(sd(r.vals))}`);
+    });
+    const right = h('div', {}, ps), car = c.car, all = car.ols.concat(car.ridge);
+    const m0 = (Math.min(...all) + Math.max(...all)) / 2;
+    const Q = plot(right, { w: 470, h: 205, x: [m0 - 1.6, m0 + 1.6], y: [0, 2], yt: [], title: 'Прогноз для одной машины validation', xl: 'mpg', xf: v => fmt(v, 1), xn: 4, grid: false, m: { l: 70, r: 12 } });
+    [['ols', 'МНК', C.orange, 1.5], ['ridge', 'Ridge', C.blue, 0.5]].forEach(([k, l, col, y]) => {
+      h('text', { x: 60, y: Q.sy(y) + 5, 'text-anchor': 'end', 'font-size': 16, fill: col, 'font-weight': 600 }, Q.svg, l);
+      Q.dots(car[k], car[k].map(() => y + (rnd() - 0.5) * 0.4), { fill: col, r: 3.5, opacity: .85 });
+    });
+    h('p', { class: 'scene-note', html: `${car.name.replace(/\b\w/g, ch => ch.toUpperCase())}: разброс прогноза <b>${fmt(sd(car.ols))}</b> mpg у МНК и <b>${fmt(sd(car.ridge))}</b> у Ridge. Вес массы у МНК при этом меняется от ${fmt(Math.min(...c.ols.map(v => v[0])), 1)} до ${fmt(Math.max(...c.ols.map(v => v[0])), 1)}.` }, right);
+    h('p', { class: 'scene-caption', html: 'Каждая точка — одна модель, обученная на бутстреп-выборке train (выбор строк с возвращением). Масштабирование обучено на train.' }, right);
   };
 
   // ---------- веса МНК, Ridge и Lasso ----------

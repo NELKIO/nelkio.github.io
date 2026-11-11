@@ -323,78 +323,36 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <div class="panel"><h3>Зачем 1/2</h3><p>Сократится с двойкой при взятии производной. Положение минимума не меняет.</p></div>
 <div class="panel"><h3>Связь с метриками</h3><p><span data-tex="J=\tfrac12\,\text{MSE}"></span>,&nbsp; <span data-tex="\text{RMSE}=\sqrt{\text{MSE}}"></span>. Минимум у всех трёх — при одних и тех же весах.</p></div>
 </div>
-<p class="small"><span data-tex="J"></span> — парабола по <span data-tex="w"></span> и по <span data-tex="b"></span>. В минимуме обе производные равны нулю — как на лекции про оптимизацию.</p>
+<p class="small"><span data-tex="J"></span> — парабола по <span data-tex="w"></span> и по <span data-tex="b"></span>. Её минимум найдём так же, как на лекции про оптимизацию: через производную.</p>
 </section>
 
-<section id="solve-b" class="slide level2">
-<h2>Шаг 1. Производная по b</h2>
-<div class="equation" data-tex="\frac{\partial J}{\partial b}=\frac1n\sum_{i=1}^{n}\bigl(w\,x_i+b-y_i\bigr)=w\,\bar x+b-\bar y=0" data-display=""></div>
-<div class="equation accent center" data-tex="b=\bar y-w\,\bar x" data-display=""></div>
-<div class="two">
-<div><h3>Что это значит</h3><p>Лучшая прямая проходит через точку средних <span data-tex="(\bar x,\;\bar y)"></span>.</p><p>Сумма остатков на train равна нулю: модель в среднем не завышает и не занижает.</p></div>
-<div><h3>Проверка на Auto MPG</h3><p><span data-tex="\bar x=3{,}019"></span> тыс. фунтов, <span data-tex="\bar y=23{,}35"></span> mpg.</p><p><span data-tex="47{,}32-7{,}94\cdot 3{,}019=23{,}35"></span> ✓</p></div>
-</div>
+<section id="min-derivative" class="slide level2 demo-slide">
+<h2>Минимум ищем через производную</h2>
+<p class="lead">Зафиксируем b = 47,32 и будем менять только наклон w. Ошибка J по w — парабола.</p>
+<div class="scene" data-scene="tangent"></div>
+<p class="takeaway">В минимуме производная равна нулю. Слева от него она отрицательна, справа — положительна: знак подсказывает, куда двигать вес.</p>
+<aside class="notes">Подвигать ползунок: касательная к параболе наклоняется, её наклон — производная. В точке минимума касательная горизонтальна. Это и есть условие, по которому МНК находит веса. Отсюда же два пути: решить уравнение «производная = 0» или шагать против производной — градиентный спуск.</aside>
 </section>
 
-<section id="solve-w" class="slide level2">
-<h2>Шаг 2. Производная по w</h2>
-<p>Подставим <span data-tex="b=\bar y-w\bar x"></span>: остаток станет <span data-tex="r_i=w(x_i-\bar x)-(y_i-\bar y)"></span>. Приравняем производную к нулю:</p>
-<div class="equation" data-tex="\frac{\partial J}{\partial w}=\frac1n\sum_{i=1}^{n}\bigl[w(x_i-\bar x)-(y_i-\bar y)\bigr](x_i-\bar x)=0" data-display=""></div>
-<div class="equation accent center" data-tex="w=\frac{\sum_i (x_i-\bar x)(y_i-\bar y)}{\sum_i (x_i-\bar x)^2}" data-display=""></div>
-<div class="two">
-<div><p><b>Числитель:</b> меняются ли <span data-tex="x"></span> и <span data-tex="y"></span> согласованно. Оба выше среднего или оба ниже — слагаемое положительное.</p></div>
-<div><p><b>Знаменатель:</b> разброс <span data-tex="x"></span>. Если все <span data-tex="x_i"></span> одинаковые, он равен нулю — наклон по таким данным определить нельзя.</p></div>
-</div>
-</section>
-
-<section id="three-points" class="slide level2">
-<h2>МНК руками: три точки</h2>
-<p class="lead">Точки (0; 1), (1; 2), (2; 2). Средние: <span data-tex="\bar x=1"></span>, <span data-tex="\bar y=\tfrac53"></span>.</p>
-<div class="two">
+<section id="system" class="slide level2">
+<h2>Производные равны нулю — это система линейных уравнений</h2>
+<p class="lead">Для одного признака две неизвестные, w и b, и две производные. Приравняем обе к нулю и разделим на n:</p>
+<div class="two" style="gap:34px">
 <div>
-<table class="compact num">
-<tbody>
-<tr><th>x</th><th>y</th><th><span data-tex="x-\bar x"></span></th><th><span data-tex="y-\bar y"></span></th><th>произведение</th></tr>
-<tr><td>0</td><td>1</td><td>−1</td><td>−2/3</td><td>2/3</td></tr>
-<tr><td>1</td><td>2</td><td>0</td><td>1/3</td><td>0</td></tr>
-<tr><td>2</td><td>2</td><td>1</td><td>1/3</td><td>1/3</td></tr>
-<tr class="hl"><td colspan="2"><b>Сумма</b></td><td><span data-tex="\sum(x-\bar x)^2=2"></span></td><td></td><td><b>1</b></td></tr>
-</tbody>
-</table>
+<div class="equation accent" data-tex="\begin{cases}\overline{x^2}\cdot w+\bar x\cdot b=\overline{xy}\\[2pt] \bar x\cdot w+b=\bar y\end{cases}" data-display=""></div>
+<p class="small">Черта — среднее по train. Коэффициенты считаются по всей выборке, а дальше — обычная школьная система.</p>
+<p style="margin-bottom:4px"><b>Auto MPG</b>, масса → экономичность:</p>
+<div class="equation plain math-small" data-tex="\begin{cases}9{,}80\,w+3{,}02\,b=65{,}06\\[2pt] 3{,}02\,w+b=23{,}35\end{cases}\;\Rightarrow\; w=-7{,}94,\;b=47{,}32" data-display=""></div>
 </div>
-<div>
-<div class="equation" data-tex="w=\frac{1}{2},\qquad b=\frac53-\frac12\cdot 1=\frac76" data-display=""></div>
-<table class="compact num">
-<tbody>
-<tr><th>x</th><th>y</th><th>ŷ</th><th>r = ŷ − y</th></tr>
-<tr><td>0</td><td>1</td><td>7/6</td><td>+1/6</td></tr>
-<tr><td>1</td><td>2</td><td>5/3</td><td>−1/3</td></tr>
-<tr><td>2</td><td>2</td><td>13/6</td><td>+1/6</td></tr>
-</tbody>
-</table>
+<div class="panel">
+<h3>Руками: точки (0; 1), (1; 2), (2; 2)</h3>
+<p><span data-tex="\bar x=1,\;\bar y=\tfrac53,\;\overline{x^2}=\tfrac53,\;\overline{xy}=2"></span></p>
+<div class="equation plain math-small" data-tex="\begin{cases}\tfrac53w+b=2\\[2pt] w+b=\tfrac53\end{cases}\;\Rightarrow\;\tfrac23w=\tfrac13\;\Rightarrow\;w=\tfrac12,\;b=\tfrac76" data-display=""></div>
+<p class="small">Этот пример пересчитаем на семинаре в NumPy.</p>
 </div>
 </div>
-<p class="takeaway">Сумма остатков: 1/6 − 1/3 + 1/6 = 0. Этот пример пересчитаем на семинаре в NumPy.</p>
-</section>
-
-<section id="normal-eq" class="slide level2">
-<h2>Много признаков: та же идея в матричной записи</h2>
-<p>Допишем к <span data-tex="X"></span> столбец единиц: <span data-tex="\tilde X=[\,1,\;X\,]"></span>, <span data-tex="\theta=(b,\;w)"></span>. Тогда <span data-tex="\hat y=\tilde X\theta"></span>, и все производные равны нулю, когда</p>
-<div class="equation accent center" data-tex="\tilde X^{\top}(\tilde X\theta-y)=0\qquad\Longrightarrow\qquad\theta=(\tilde X^{\top}\tilde X)^{-1}\tilde X^{\top}y" data-display=""></div>
-<div class="two">
-<div>
-<p class="small">Формула с обратной матрицей работает, когда столбцы <span data-tex="\tilde X"></span> не выражаются друг через друга. В коде матрицу не обращают — вызывают устойчивый решатель.</p>
-</div>
-<div>
-<pre><code>X1 = np.c_[np.ones(len(X)), X]
-theta, *_ = np.linalg.lstsq(X1, y, rcond=None)
-
-<span class="c"># то же самое в scikit-learn</span>
-model = LinearRegression().fit(X, y)
-model.intercept_, model.coef_</code></pre>
-</div>
-</div>
-<p class="takeaway">Одна формула вместо перебора: МНК решается точно и быстро.</p>
+<div class="bridge-rule">Для d признаков — система из d + 1 уравнения: <span data-tex="A\theta=c"></span>, где <span data-tex="A=\tilde X^{\top}\tilde X,\;c=\tilde X^{\top}y"></span>. Её и решает <code>LinearRegression().fit(X, y)</code>.</div>
+<aside class="notes">Вывод формулы наклона через центрирование не делаем. Достаточно: J — парабола, в минимуме производные нулевые, получается система Aθ = c, её решает библиотека. Если спросят про обратную матрицу: θ = A⁻¹c работает, когда признаки не дублируют друг друга; в коде вызывают устойчивый решатель (np.linalg.lstsq).</aside>
 </section>
 
 <section id="gradient" class="slide level2">
@@ -440,7 +398,7 @@ for step in range(n_steps):
 <button type="button">Прогнозы и RMSE на validation</button>
 <button type="button">Ничего: вес останется −7,94</button>
 <button type="button">Вес при массе изменится, прогнозы останутся теми же</button>
-<button type="button">Модель перестанет быть линейной</button>
+<button type="button">Вес при массе останется прежним, изменится только свободный член b</button>
 </div>
 <p class="quiz-why">Умножение признака на константу МНК компенсирует весом: w · x не меняется. У точного решения без штрафа прогнозы от единиц измерения не зависят.</p>
 </div>
@@ -453,9 +411,9 @@ for step in range(n_steps):
 <button type="button">Добавить больше итераций</button>
 <button type="button">Уменьшить шаг η и стандартизовать признаки</button>
 <button type="button">Заменить MSE на RMSE</button>
-<button type="button">Убрать свободный член b</button>
+<button type="button">Добавить к функции потерь Ridge-штраф</button>
 </div>
-<p class="quiz-why">Расходимость — признак слишком большого шага для самого «крутого» направления. Стандартизация выравнивает масштабы, после неё один шаг подходит всем весам.</p>
+<p class="quiz-why">Расходимость — признак слишком большого шага для самого «крутого» направления. Стандартизация выравнивает масштабы, после неё один шаг подходит всем весам. Штраф делает функцию потерь только круче — расходимость от него не исчезнет.</p>
 </div>
 </section>
 
@@ -546,10 +504,11 @@ model.predict(X_val)</code></pre>
 </section>
 
 <section id="collinear" class="slide level2 demo-slide">
-<h2>Похожие признаки: веса скачут, прогноз почти не меняется</h2>
-<p class="lead">Масса и объём двигателя почти дублируют друг друга. Обучим модель 40 раз на случайных подвыборках train.</p>
+<h2>Похожие признаки: веса нестабильны, прогноз — нет</h2>
+<p class="lead">Масса и объём двигателя почти дублируют друг друга (корреляция 0,92). Обучим модель на них 40 раз на случайных подвыборках train.</p>
 <div class="scene" data-scene="collinear"></div>
-<aside class="notes">Каждая точка — пара весов одной модели. У МНК облако вытянуто по диагонали: модель может «перекладывать» вклад с массы на объём и обратно, сумма вкладов почти та же. Поэтому по отдельному весу нельзя судить о важности. Ridge стягивает облако. Это тот же эффект, что перестановочная важность у коррелирующих температур в лекции про бустинг.</aside>
+<p class="takeaway">Данные хорошо определяют <b>сумму</b> весов похожих признаков, но не то, как её поделить. Поэтому по отдельному весу нельзя судить о важности признака.</p>
+<aside class="notes">Каждая точка — одна обученная модель. У МНК вес массы гуляет от −6,7 до −2,8, а сумма весов массы и объёма почти постоянна. Прогноз для конкретной машины меняется меньше чем на ±0,5 mpg. Ridge делит вклад ровнее, его веса стабильнее; прогноз такой же стабильный. Связь с бустингом: перестановочная важность коррелирующих температур.</aside>
 </section>
 
 <section id="regularization" class="slide level2">
@@ -587,14 +546,14 @@ model.predict(X_val)</code></pre>
 <div>
 <p class="lead" style="font-size:22px;margin-bottom:8px">Шесть признаков, все стандартизованы. Цилиндры, объём, мощность и масса сильно связаны.</p>
 <div class="line-list">
-<p><b class="muted">МНК.</b> Вес мощности <b>положительный</b> — будто мощная машина экономичнее. Так модель компенсирует похожие признаки.</p>
-<p><b class="blue">Ridge.</b> Все веса меньше по модулю, знак мощности стал естественным. Нулей нет.</p>
-<p><b class="orange">Lasso.</b> Цилиндры и разгон — <b>ровно ноль</b>: модели хватило массы и объёма.</p>
+<p><b class="muted">МНК.</b> Веса цилиндров, мощности и разгона положительные. По отдельности их не прочитать: модель делит вклад между похожими признаками.</p>
+<p><b class="blue">Ridge.</b> Общая величина весов меньше: ‖w‖ 6,28 → 5,01. Вклад похожих признаков перераспределился: объём −0,71 → −1,05, мощность +0,27 → −0,43. Нулей нет.</p>
+<p><b class="orange">Lasso.</b> Цилиндры и разгон — <b>ровно ноль</b>. Остались масса, объём, год и небольшой вес мощности.</p>
 </div>
 <p class="small">RMSE на validation: МНК 3,02 · Ridge 3,01 · Lasso 2,79 mpg. alpha у каждой модели выбран по validation.</p>
 </div>
 </div>
-<aside class="notes">Обратить внимание: знак веса у МНК при связанных признаках может быть «неправильным» — это не свойство машин, а способ модели поделить вклад между похожими столбцами. Lasso выбрал один признак из группы похожих; на другой выборке выбор может отличаться.</aside>
+<aside class="notes">Ridge ограничивает сумму квадратов весов, а не каждый вес по отдельности: при связанных признаках отдельный вес может вырасти по модулю и сменить знак. Знак веса у МНК при связанных признаках не стоит читать как свойство машин — это способ модели поделить вклад между похожими столбцами. Lasso выбрал один признак из группы похожих; на другой выборке выбор может отличаться.</aside>
 </section>
 
 <section id="tune-alpha" class="slide level2">
@@ -632,7 +591,7 @@ model.predict(X_val)</code></pre>
 <button type="button">Обучить на всей таблице, потом разбить на train и validation</button>
 <button type="button">Обучить на train, применить к train, validation и test</button>
 <button type="button">Обучить отдельно на train, отдельно на validation и отдельно на test</button>
-<button type="button">Масштабировать только ответ y</button>
+<button type="button">Не масштабировать: Ridge сам подстроит веса под единицы измерения</button>
 </div>
 <p class="quiz-why">Среднее и разброс — тоже параметры, выученные по данным. Если считать их по всей таблице, информация из validation и test утекает в обучение. Pipeline исключает эту ошибку.</p>
 </div>
@@ -644,7 +603,7 @@ model.predict(X_val)</code></pre>
 <div class="quiz-options">
 <button type="button">Число цилиндров не связано с экономичностью</button>
 <button type="button">Масса — причина расхода, цилиндры — нет</button>
-<button type="button">В данных ошибка, признак надо удалить из таблицы</button>
+<button type="button">Цилиндры можно выкинуть из таблицы для любой модели</button>
 <button type="button">При этом штрафе модели хватило других признаков, похожих на этот</button>
 </div>
 <p class="quiz-why">Цилиндры сильно коррелируют с массой и объёмом. Lasso оставляет один признак из группы похожих; какой именно — может зависеть от выборки. О причинности веса не говорят.</p>
@@ -793,9 +752,9 @@ b -= eta * (p - y).mean()</code></pre>
 <div class="scene bare" data-scene="digitweights"></div>
 <div>
 <p>64 веса — по одному на пиксель. Разложим их в ту же сетку 8×8.</p>
-<p>Оранжевые пиксели — в левой половине. У восьмёрки там левые стороны петель, у тройки пусто: яркий пиксель в этом месте повышает score «8».</p>
-<div class="bridge-rule">Score изображения — сумма «яркость пикселя × вес». Ровно та же сумма вкладов, что в прогнозе для Dodge Aspen.</div>
-<p class="small">Веса показаны для стандартизованных признаков. Это описание модели, а не «объяснение» того, как устроены цифры.</p>
+<p>Оранжевые пиксели — в левой половине. У восьмёрки там левые стороны петель, у тройки пусто: если пиксель там ярче обычного, score «8» растёт.</p>
+<div class="equation math-small" data-tex="z=b+\sum_{j=1}^{64}w_j\cdot\frac{\text{яркость}_j-\text{средняя}_j}{\text{разброс}_j}" data-display=""></div>
+<p class="small">Модель видит не саму яркость, а стандартизованную: насколько пиксель ярче или темнее своего среднего на train. Та же сумма вкладов плюс свободный член, что и в прогнозе для Dodge Aspen. Это описание модели, а не «объяснение» того, как устроены цифры.</p>
 </div>
 </div>
 <aside class="notes">Спросить зал: где у тройки чернила, а у восьмёрки нет, и наоборот? Оранжевые пиксели слева в середине — левая сторона петель восьмёрки, у тройки там пусто.</aside>
@@ -857,11 +816,24 @@ b -= eta * (p - y).mean()</code></pre>
 <h2>Логистическая регрессия выдала для объекта p = 0,3. Какой класс предскажет модель?</h2>
 <div class="quiz-options">
 <button type="button">Класс 0: вероятность меньше половины</button>
-<button type="button">Класс 1: вероятность больше нуля</button>
+<button type="button">Класс 1 с вероятностью 0,3: модель выбирает класс случайно</button>
 <button type="button">Зависит от порога: при t = 0,5 — класс 0, при t = 0,2 — класс 1</button>
-<button type="button">Никакой: p = 0,3 означает, что модель не обучилась</button>
+<button type="button">Класс 0, а порог менять нельзя: 0,5 зашит в log loss</button>
 </div>
 <p class="quiz-why">Вероятность и класс — разные величины. Метод predict использует порог 0,5, но это соглашение по умолчанию, а не свойство модели. Порог выбирают под цену ошибок.</p>
+</div>
+</section>
+
+<section id="quiz-logit-weight" class="slide level2 quiz-slide">
+<div class="quiz" data-answer="2" data-time="30">
+<h2>У логрега вес признака «стаж» равен 0,7. Стаж вырос на 1 год, остальное не изменилось. Что произошло?</h2>
+<div class="quiz-options">
+<button type="button">Вероятность класса 1 выросла на 0,7</button>
+<button type="button">Вероятность класса 1 выросла на 70%</button>
+<button type="button">Score вырос на 0,7, шансы p/(1−p) умножились на e<sup>0,7</sup> ≈ 2</button>
+<button type="button">Score вырос на 0,7, поэтому класс обязательно сменится</button>
+</div>
+<p class="quiz-why">Вес линейно меняет score — логарифм шансов. Шансы умножаются на e<sup>0,7</sup> ≈ 2,01. Насколько при этом вырастет вероятность, зависит от того, где объект на сигмоиде: от 0,5 до 0,67, но от 0,95 только до 0,975.</p>
 </div>
 </section>
 
@@ -872,7 +844,7 @@ b -= eta * (p - y).mean()</code></pre>
 <button type="button">Штраф ослабнет: веса вырастут, log loss на train уменьшится</button>
 <button type="button">Штраф усилится: веса станут ближе к нулю</button>
 <button type="button">Изменится порог классификации</button>
-<button type="button">Модель превратится в линейную регрессию</button>
+<button type="button">Ничего: C влияет только на скорость обучения</button>
 </div>
 <p class="quiz-why">C — обратная сила регуляризации. Большое C разрешает большие веса. Качество на validation при этом может как вырасти, так и упасть — проверяем.</p>
 </div>
@@ -908,7 +880,7 @@ b -= eta * (p - y).mean()</code></pre>
 <tr><th></th><th>Дерево, бустинг</th><th>Линейная регрессия</th><th>Логистическая регрессия</th></tr>
 <tr><td><b>Задача</b></td><td>регрессия и классификация</td><td>регрессия</td><td>классификация</td></tr>
 <tr><td><b>Что выдаёт</b></td><td>ответ листа или сумму листьев</td><td>число <span data-tex="w\cdot x+b"></span></td><td>вероятность <span data-tex="\sigma(w\cdot x+b)"></span></td></tr>
-<tr><td><b>Форма</b></td><td>ступеньки, прямоугольники</td><td>прямая, плоскость</td><td>прямая граница классов</td></tr>
+<tr><td><b>Форма</b></td><td>ступеньки, прямоугольники</td><td>прямая, плоскость — на исходных признаках</td><td>прямая граница — на исходных признаках</td></tr>
 <tr><td><b>Что обучаем</b></td><td>признаки и пороги в узлах</td><td>веса: МНК или спуск</td><td>веса: спуск по log loss</td></tr>
 <tr><td><b>Взаимодействия</b></td><td>находит само при глубине ≥ 2</td><td colspan="2">нужен столбец <span data-tex="x_1x_2"></span></td></tr>
 <tr><td><b>Масштаб признаков</b></td><td>не важен</td><td colspan="2">важен для спуска и штрафа</td></tr>
@@ -917,6 +889,7 @@ b -= eta * (p - y).mean()</code></pre>
 <tr><td><b>Как заглянуть внутрь</b></td><td>важности, SHAP, ICE</td><td colspan="2">веса — при одинаковом масштабе и с оглядкой на похожие признаки</td></tr>
 </tbody>
 </table>
+<p class="small">С новыми признаками (x², x₁·x₂, one-hot) обе линейные модели рисуют кривые — они остаются линейными по весам.</p>
 </section>
 
 <section id="when-linear" class="slide level2">
@@ -936,7 +909,7 @@ b -= eta * (p - y).mean()</code></pre>
 <button type="button">Обе выдадут среднее по train</button>
 <button type="button">Дерево выдаст ответ крайнего листа, прямая продолжит снижать прогноз</button>
 <button type="button">Дерево продолжит тренд, прямая выдаст константу</button>
-<button type="button">Обе откажутся делать прогноз</button>
+<button type="button">Обе продолжат тренд: они обучены на одних данных</button>
 </div>
 <p class="quiz-why">Дерево не знает ничего за последним порогом — там тот же лист. Линейная модель экстраполирует; хорошо это или плохо, зависит от того, продолжается ли тренд на самом деле.</p>
 </div>
@@ -962,9 +935,9 @@ b -= eta * (p - y).mean()</code></pre>
 <button type="button">Бустинг с деревьями глубины 2</button>
 <button type="button">Линейная регрессия</button>
 <button type="button">Ridge с правильно подобранным alpha</button>
-<button type="button">Никакая: нужны другие данные</button>
+<button type="button">Линейная регрессия, если добавить столбцы скидка² и выходной²</button>
 </div>
-<p class="quiz-why">Дерево глубины 2 задаёт два вопроса подряд: «выходной?» и «есть скидка?». Линейной модели нужен столбец «скидка × выходной» — тогда и она справится.</p>
+<p class="quiz-why">Дерево глубины 2 задаёт два вопроса подряд: «выходной?» и «есть скидка?». Линейной модели нужен столбец «скидка × выходной» — квадраты отдельных признаков взаимодействие не описывают.</p>
 </div>
 </section>
 
@@ -984,7 +957,7 @@ b -= eta * (p - y).mean()</code></pre>
 <div class="flow">
 <div><b>01</b><h3>Задача и метрика</h3><p>Число или класс? Что считается ошибкой и что сдаём: метки или вероятности?</p></div>
 <div><b>02</b><h3>Разбиение</h3><p>Train, validation, test — до любой подгонки. Для классов — стратификация.</p></div>
-<div><b>03</b><h3>Константа</h3><p>Среднее, медиана или частый класс. Точка отсчёта для всех моделей.</p></div>
+<div><b>03</b><h3>Константа</h3><p>Регрессия: среднее или медиана. Классы: доля класса 1 на train как вероятность, для accuracy — частый класс.</p></div>
 <div><b>04</b><h3>Признаки</h3><p>Пропуски, one-hot, масштаб. Всё внутри Pipeline, обучение только на train.</p></div>
 <div><b>05</b><h3>Простая модель</h3><p>Ridge или логрег. Быстро и видно, решаема ли задача.</p></div>
 <div><b>06</b><h3>Настройка</h3><p>alpha или C, новые признаки, порог — по validation.</p></div>

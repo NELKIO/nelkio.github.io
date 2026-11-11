@@ -200,3 +200,7 @@ html.print-pdf .quiz .quiz-options button.right::before{background:var(--green);
 .reveal #scenarios .scenario .small{font-size:21px;margin-top:16px}
 .reveal #pipeline .flow{margin-top:24px;gap:20px}
 .reveal #pipeline .flow>div{min-height:225px}
+
+.reveal #comparison table{font-size:19px}
+.reveal #comparison td,.reveal #comparison th{padding:6px 10px}
+.reveal #comparison .small{margin:6px 0 0;font-size:18px}
