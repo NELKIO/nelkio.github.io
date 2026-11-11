@@ -510,20 +510,24 @@ model.predict(X_val)</code></pre>
 <h2>Похожие признаки: МНК не знает, как поделить вклад</h2>
 <div class="two" style="grid-template-columns:1fr 1.3fr;gap:30px">
 <div>
-<p>Пусть <span data-tex="x_2"></span> — точная копия <span data-tex="x_1"></span>. Все эти модели дают <b>одинаковые</b> прогнозы:</p>
-<div class="equation math-small" data-tex="\hat y=2x_1+0x_2=x_1+x_2=102x_1-100x_2" data-display=""></div>
-<p>Данные задают только сумму <span data-tex="w_1+w_2=2"></span>. Как её поделить — модели всё равно, поэтому веса случайны и могут стать огромными.</p>
+<p>Пусть признак <span data-tex="x_2"></span> — точная копия <span data-tex="x_1"></span>.</p>
+<p>Данные задают только сумму весов:</p>
+<div class="equation math-small center" data-tex="w_1+w_2=2" data-display=""></div>
+<p>Как её поделить — модели всё равно: подходят и 1 + 1, и 102 − 100.</p>
+<p>Поэтому веса случайны и могут стать огромными.</p>
 </div>
 <div>
-<p>Auto MPG: масса и объём двигателя, корреляция 0,92. Обучили МНК и Ridge 40 раз на случайных подвыборках train:</p>
+<p>Три модели на одних данных:</p>
 <table class="compact num" style="white-space:nowrap">
 <tbody>
-<tr><th></th><th>Вес массы</th><th>Вес объёма</th><th>Прогноз, mpg</th></tr>
-<tr><td style="text-align:left">МНК</td><td>−6,67 … −2,77</td><td>−3,90 … +0,13</td><td>20,3 … 21,2</td></tr>
-<tr><td style="text-align:left">Ridge</td><td>−4,06 … −2,90</td><td>−3,44 … −2,07</td><td>20,5 … 21,7</td></tr>
+<tr><th>x₁</th><th>x₂</th><th>y</th><th>2x₁ + 0x₂</th><th>x₁ + x₂</th><th>102x₁ − 100x₂</th></tr>
+<tr><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>2</td><td>2</td><td>4</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>3</td><td>3</td><td>6</td><td>6</td><td>6</td><td>6</td></tr>
+<tr class="hl"><td>2</td><td>2,1</td><td>?</td><td>4</td><td>4,1</td><td><b>−6</b></td></tr>
 </tbody>
 </table>
-<p class="small">От меньшего до большего значения за 40 обучений. Признаки стандартизованы, Ridge с alpha = 30, прогноз — для одной машины validation. Прогноз стабилен у обеих моделей, веса — только у Ridge.</p>
+<p class="small">На train все три безошибочны. Но пусть у нового объекта <span data-tex="x_2"></span> чуть отличается от <span data-tex="x_1"></span> — модель с огромными весами усиливает разницу в 100 раз.</p>
 </div>
 </div>
 <p class="takeaway">Есть похожие признаки — по отдельному весу о важности не судим. Помогает Ridge (делит вклад поровну), Lasso (оставит один из группы) или удаление дубля.</p>
