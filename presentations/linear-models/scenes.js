@@ -116,24 +116,6 @@
     draw(10);
   };
 
-  // ---------- подбор прямой руками ----------
-  S.handfit = root => {
-    const bar = controls(root), P = mpgPlot(root, { h: 400 });
-    P.dots(sm.train[0], sm.train[1], { fill: C.gray, opacity: .55, layer: P.back });
-    const n = note(root);
-    const rm = (w, b) => Math.sqrt(mean(sm.train[0].map((x, i) => (w * x + b - sm.train[1][i]) ** 2)));
-    let w = -4, b = 35;
-    function draw() {
-      P.clear();
-      P.line([1.4, 5.4], [b + w * 1.4, b + w * 5.4], { stroke: C.orange });
-      n.innerHTML = `ŷ = ${fmt(b, 1)} ${w < 0 ? '−' : '+'} ${fmt(Math.abs(w), 1)}·x · RMSE на train: <b>${fmt(rm(w, b))}</b> mpg · минимум, который находит МНК: <b>${fmt(sm.train_rmse)}</b> mpg`;
-    }
-    const sw = slider(bar, { label: 'Наклон w', min: -14, max: 0, step: 0.1, value: w, fmt: v => fmt(v, 1), on: v => { w = v; draw(); } });
-    const sb = slider(bar, { label: 'Свободный член b', min: 20, max: 70, step: 0.5, value: b, fmt: v => fmt(v, 1), on: v => { b = v; draw(); } });
-    button(bar, 'Показать решение МНК', () => { w = sm.w; b = sm.b; sw.set(w); sb.set(b); draw(); }, true);
-    draw();
-  };
-
   // ---------- градиентный спуск ----------
   S.gd = root => {
     const bar = controls(root), ps = panels(root), n = note(root);
@@ -233,14 +215,16 @@
 
   // ---------- регуляризация полинома степени 12 ----------
   S.ridgepoly = root => {
-    const p = D.poly, rp = D.ridge_poly;
-    const P = plot(root, { w: +root.dataset.w || 640, h: 370, x: [-1.12, 1.12], y: [-5.6, 2.8], xl: 'x', xf: v => fmt(v, 1) });
-    P.line(p.grid, p.truth, { stroke: C.gray, 'stroke-dasharray': '6 5', 'stroke-width': 1.6, layer: P.back });
-    P.dots(p.val[0], p.val[1], { fill: '#fff', stroke: C.gray, opacity: 1, r: 4, layer: P.back });
-    P.dots(p.train[0], p.train[1], { fill: C.ink, opacity: .8, r: 4, layer: P.back });
-    const style = { none: [C.orange, 'без штрафа'], best: [C.blue, `Ridge, alpha = ${fmt(rp.fits[1].alpha, 2)}`], strong: [C.violet, 'Ridge, alpha = 100'] };
-    rp.fits.forEach(f => P.line(p.grid, f.curve, { stroke: style[f.label][0], 'stroke-width': 3 }));
-    legend(root, rp.fits.map(f => ({ color: style[f.label][0], label: `${style[f.label][1]} · ‖w‖ = ${fmt(f.norm, f.norm > 10 ? 0 : 1)} · RMSE val ${fmt(f.val)}` })).concat([{ color: C.ink, label: 'train', dot: 1 }, { color: C.gray, label: 'validation (полые)', dot: 1 }]));
+    const p = D.poly, rp = D.ridge_poly, box = h('div', { class: 'scene-panels', style: 'grid-template-columns:repeat(3,1fr);gap:22px' }, root);
+    const meta = { none: ['Без штрафа', C.orange], best: [`Подобранный штраф, alpha = ${fmt(rp.fits[1].alpha, 2)}`, C.blue], strong: ['Сильный штраф, alpha = 100', C.violet] };
+    rp.fits.forEach(f => {
+      const cell = h('div', {}, box);
+      const P = plot(cell, { w: 400, h: 260, x: [-1.12, 1.12], y: [-5.6, 2.8], title: meta[f.label][0], xf: v => fmt(v, 1), xn: 4, yn: 4, m: { l: 34, r: 8 } });
+      P.line(p.grid, p.truth, { stroke: C.gray, 'stroke-dasharray': '6 5', 'stroke-width': 1.5, layer: P.back });
+      P.dots(p.train[0], p.train[1], { fill: C.ink, opacity: .7, r: 3.5, layer: P.back });
+      P.line(p.grid, f.curve, { stroke: meta[f.label][1], 'stroke-width': 3.2 });
+      h('p', { class: 'scene-note', html: `‖w‖ = <b>${fmt(f.norm, f.norm > 10 ? 0 : 1)}</b> · RMSE validation <b>${fmt(f.val)}</b>` }, cell);
+    });
   };
 
   // ---------- одномерные Ridge и Lasso ----------
@@ -266,42 +250,39 @@
     caption(root, `Auto MPG · признаки стандартизованы по train · корреляция массы и объёма на train: ${fmt(c.corr)} · alpha = ${c.alpha} задан заранее для демонстрации, без подбора.`);
   };
 
-  // ---------- пути коэффициентов ----------
-  S.paths = root => {
-    const p = D.paths, cols = [C.gray, C.violet, C.gold, C.blue, C.green, C.orange];
-    const bar = controls(root), ps = panels(root, 'p32'), n = note(root);
-    let kind = 'ridge', idx = p.ridge.best, P, Q;
-    const lg = v => Math.log10(v);
-    function build() {
-      ps.replaceChildren();
-      const q = p[kind], lx = q.alpha.map(lg), xr = [lx[0], lx[lx.length - 1]];
-      const xt = range(Math.ceil(xr[0]), Math.floor(xr[1]), Math.floor(xr[1]) - Math.ceil(xr[0]) + 1).map(v => ({ v, label: v >= 0 ? String(10 ** v) : fmt(10 ** v, -v) }));
-      P = plot(ps, { w: 740, h: 380, x: xr, y: [-6.2, 3.4], xt, xl: 'alpha (логарифмическая шкала)', title: 'Веса шести стандартизованных признаков' });
-      Q = plot(ps, { w: 480, h: 380, x: xr, y: [2.6, 8], xt, xl: 'alpha', title: 'RMSE на validation, mpg' });
-      P.seg(xr[0], 0, xr[1], 0, { stroke: '#c5ccd4', layer: P.back });
-      p.features.forEach((f, j) => P.line(lx, q.coef.map(c => c[j]), { stroke: cols[j], layer: P.back }));
-      Q.line(lx, q.val_rmse, { stroke: C.ink, layer: Q.back });
-      Q.seg(xr[0], p.ols.val_rmse, xr[1], p.ols.val_rmse, { stroke: C.gray, 'stroke-dasharray': '5 5', layer: Q.back });
-      Q.text(xr[0], p.ols.val_rmse, 'МНК без штрафа', { dx: 8, dy: 18, fill: C.muted, layer: Q.back });
-      sl.max(q.alpha.length - 1);
-    }
-    function draw() {
-      const q = p[kind], x = lg(q.alpha[idx]);
-      P.clear(); Q.clear();
-      P.seg(x, -6.2, x, 3.4, { 'stroke-dasharray': '4 4' });
-      Q.seg(x, 2.6, x, 8, { 'stroke-dasharray': '4 4' });
-      Q.mark(x, q.val_rmse[idx], { r: 6 });
-      const nz = q.coef[idx].filter(v => Math.abs(v) > 1e-9).length;
-      n.innerHTML = `${kind === 'ridge' ? 'Ridge' : 'Lasso'} · alpha = <b>${fmt(q.alpha[idx], q.alpha[idx] < 1 ? 3 : 1)}</b> · ненулевых весов: <b>${nz} из 6</b> · RMSE validation <b>${fmt(q.val_rmse[idx])}</b> · лучший alpha по validation: ${fmt(q.alpha[q.best], q.alpha[q.best] < 1 ? 2 : 0)} (RMSE ${fmt(q.val_rmse[q.best])})`;
-    }
-    seg(bar, '', [{ label: 'Ridge', value: 'ridge' }, { label: 'Lasso', value: 'lasso' }], kind, v => { kind = v; idx = p[kind].best; build(); sl.set(idx); draw(); });
-    const lab = h('label', {}, bar); h('span', {}, lab, 'Сила штрафа');
-    const inp = h('input', { type: 'range', min: 0, max: 40, step: 1, value: idx }, lab);
-    inp.addEventListener('input', () => { idx = +inp.value; draw(); });
-    const sl = { set: v => { inp.value = v; }, max: v => { inp.max = v; } };
-    legend(bar, p.features.map((f, j) => ({ color: cols[j], label: f })));
-    build(); draw();
-    caption(root, 'Auto MPG · пропуски мощности заполнены медианой train, масштабирование обучено на train. alpha — параметр scikit-learn; у Ridge и Lasso разные нормировки, сравнивать их alpha между собой нельзя.');
+  // ---------- веса МНК, Ridge и Lasso ----------
+  S.weightbars = root => {
+    const b = D.paths.bars, names = D.paths.features;
+    const models = [['ols', 'МНК без штрафа', C.gray], ['ridge', `Ridge, alpha = ${fmt(b.ridge.alpha, 0)}`, C.blue], ['lasso', `Lasso, alpha = ${fmt(b.lasso.alpha, 2)}`, C.orange]];
+    legend(root, models.map(([, l, c]) => ({ color: c, label: l })));
+    const P = plot(root, { w: +root.dataset.w || 720, h: 530, x: [-6.8, 3.6], y: [0, 6], yt: [], xl: 'вес стандартизованного признака, mpg', xn: 9, m: { l: 100, t: 8 } });
+    P.seg(0, 0, 0, 6, { stroke: C.ink, 'stroke-width': 1.2, layer: P.back });
+    names.forEach((n, j) => {
+      const yc = 5.5 - j;
+      h('text', { x: P.m.l - 12, y: P.sy(yc) + 5, 'text-anchor': 'end', 'font-size': 16, fill: C.ink }, P.svg, n);
+      models.forEach(([k, , col], i) => {
+        const v = b[k].coef[j], y0 = yc + 0.27 - i * 0.27, hh = 0.2;
+        if (b[k].zero[j]) {
+          P.text(0, y0 - hh / 2, '0', { dx: 8, dy: 5, fill: col, 'font-weight': 700, 'font-size': 14 });
+          P.mark(0, y0 - hh / 2, { r: 4, fill: col, stroke: 'none' });
+        } else {
+          P.rect(0, y0, v, y0 - hh, { fill: col, layer: P.g });
+          const lab = Math.abs(v) < 0.005 ? '≈0' : fmt(v, 2);
+          P.text(v, y0 - hh / 2, lab, { dx: v < 0 ? -6 : 6, dy: 5, 'text-anchor': v < 0 ? 'end' : 'start', fill: C.muted, 'font-size': 13 });
+        }
+      });
+    });
+  };
+
+  // ---------- RMSE на validation в зависимости от alpha ----------
+  S.alphacurve = root => {
+    const q = D.paths.ridge, lx = q.alpha.map(Math.log10), xt = [-1, 0, 1, 2, 3, 4].map(v => ({ v, label: v < 0 ? '0,1' : String(10 ** v) }));
+    const P = plot(root, { w: +root.dataset.w || 560, h: 220, x: [lx[0], lx[lx.length - 1]], y: [2, 7.5], xt, xl: 'alpha у Ridge (логарифмическая шкала)', yl: 'RMSE на validation, mpg', yn: 4 });
+    P.line(lx, q.val_rmse, { stroke: C.blue });
+    P.mark(lx[q.best], q.val_rmse[q.best]);
+    caption(root, `При маленьком alpha штраф почти не действует: RMSE как у МНК без штрафа (${fmt(D.paths.ols.val_rmse)}). Auto MPG, 6 признаков.`);
+    P.text(lx[q.best], q.val_rmse[q.best], `лучший: alpha = ${fmt(q.alpha[q.best], 0)}`, { dy: -14, 'text-anchor': 'middle', fill: C.orange, 'font-weight': 600 });
+    P.text(lx[lx.length - 1], q.val_rmse[q.val_rmse.length - 1], 'слишком сильный штраф', { dx: -14, dy: 6, 'text-anchor': 'end', fill: C.muted });
   };
 
   // ---------- sigmoid ----------
@@ -382,7 +363,8 @@
   S.threshold = root => {
     const d = D.threshold, bar = controls(root), ps = panels(root, 'p32');
     const left = h('div', {}, ps), right = h('div', {}, ps);
-    const P = plot(left, { w: 740, h: 300, x: [0, 1], y: [-0.6, 1.6], xl: 'предсказанная вероятность класса 1', xf: v => fmt(v, 1), yt: [{ v: 0, label: 'y = 0' }, { v: 1, label: 'y = 1' }], grid: false, m: { l: 64 } });
+    const P = plot(left, { w: 740, h: 300, x: [0, 1], y: [-0.6, 1.9], xl: 'предсказанная вероятность класса 1', xf: v => fmt(v, 1), yt: [{ v: 0, label: 'ответ: 0' }, { v: 1, label: 'ответ: 1' }], grid: false, m: { l: 78 } });
+    const shade = h('g', {}); P.back.insertBefore(shade, P.back.firstChild);
     let s = 11; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     const jit = d.y.map(() => (rnd() - 0.5) * 0.7);
     d.y.forEach((y, i) => P.dots([d.p[i]], [y + jit[i]], { fill: y ? C.orange : C.blue, r: 4, opacity: .65, layer: P.back }));
@@ -401,8 +383,12 @@
     function draw(t) {
       const m = stat(t);
       P.clear(); Q.clear();
-      P.seg(t, -0.6, t, 1.6, { stroke: C.ink, 'stroke-width': 2.5 });
-      P.text(t, 1.6, 'класс 1 →', { dx: 8, dy: 16, fill: C.muted });
+      shade.replaceChildren();
+      P.rect(0, -0.6, t, 1.9, { fill: 'rgba(38,127,208,.07)', layer: shade });
+      P.rect(t, -0.6, 1, 1.9, { fill: 'rgba(213,103,61,.08)', layer: shade });
+      P.seg(t, -0.6, t, 1.9, { stroke: C.ink, 'stroke-width': 2.5 });
+      P.text(t, 1.9, '← модель: класс 0', { dx: -8, dy: 18, 'text-anchor': 'end', fill: C.blue, 'font-weight': 600 });
+      P.text(t, 1.9, 'модель: класс 1 →', { dx: 8, dy: 18, fill: C.orange, 'font-weight': 600 });
       Q.seg(t, 0, t, 210, { 'stroke-dasharray': '4 4' }); Q.mark(t, m.cost, { r: 6 });
       cm.innerHTML = `<div class="h"></div><div class="h">модель: 1</div><div class="h">модель: 0</div>
         <div class="h">ответ: 1</div><div class="ok">TP<b>${m.tp}</b></div><div class="bad">FN<b>${m.fn}</b></div>

@@ -501,8 +501,8 @@ for step in range(n_steps):
 </section>
 
 <section id="three-words" class="slide level2">
-<h2>Три слова на «-ция»: нормализация и стандартизация</h2>
-<p class="lead">Первые два слова меняют масштаб данных. Сами объекты и их порядок остаются прежними.</p>
+<h2>Нормализация и стандартизация: один масштаб для всех признаков</h2>
+<p class="lead">Меняем масштаб каждого признака. Порядок объектов по признаку остаётся прежним.</p>
 <div class="two" style="gap:24px">
 <div class="panel compact-panel"><h3>Нормализация · <code>MinMaxScaler</code></h3><div class="equation plain math-small" data-tex="x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}\in[0;\,1]" data-display=""></div><p class="small">Один выброс сожмёт остальные значения к краю.</p></div>
 <div class="panel compact-panel"><h3>Стандартизация · <code>StandardScaler</code></h3><div class="equation plain math-small" data-tex="x'=\frac{x-\bar x}{s_x}:\quad\text{среднее }0,\ \text{разброс }1" data-display=""></div><p class="small">Основной выбор для линейных моделей.</p></div>
@@ -512,18 +512,14 @@ for step in range(n_steps):
 </section>
 
 <section id="regularization-intro" class="slide level2">
-<h2>Третье слово — регуляризация: штраф за большие веса</h2>
-<div class="two wide-right" style="grid-template-columns:1fr 1.45fr">
-<div>
-<p>Меняет не данные, а <b>функцию потерь</b>:</p>
-<div class="equation math-small" data-tex="J(w,b)+\frac{\lambda}{2}\sum_{j}w_j^2" data-display=""></div>
-<p>Полином степени 12 из опыта со степенями: без штрафа веса огромные, кривая цепляется за шум.</p>
-<p>Небольшой штраф успокаивает кривую, слишком большой — недообучение.</p>
-<p class="small">Степени <span data-tex="x,\dots,x^{12}"></span> стандартизованы по train; alpha выбран по validation из 15 значений от 0,0001 до 1000.</p>
+<h2>Регуляризация: штраф за большие веса</h2>
+<div class="two" style="grid-template-columns:1fr 1.3fr;align-items:center;gap:30px">
+<div class="equation accent center" data-tex="J(w,b)+\frac{\lambda}{2}\sum_{j}w_j^2" data-display=""></div>
+<p style="margin:0">Меняем не данные, а <b>функцию потерь</b>: большие веса теперь стоят дорого. Пример — полином степени 12 из опыта со степенями.</p>
 </div>
-<div class="scene bare" data-scene="ridgepoly" data-w="700"></div>
-</div>
-<p class="takeaway">Как устроены Ridge и Lasso и как выбрать силу штрафа — через несколько слайдов.</p>
+<div class="scene bare" data-scene="ridgepoly" style="margin-top:16px"></div>
+<p class="scene-caption">Чёрные точки — train, пунктир — зависимость без шума. Степени x, …, x¹² стандартизованы по train; подобранный alpha — лучший по validation из 15 значений от 0,0001 до 1000.</p>
+<p class="takeaway">Нужна середина между «цепляется за шум» и «всё выпрямил» — её ищем по validation.</p>
 </section>
 
 <section id="when-scale" class="slide level2">
@@ -584,10 +580,21 @@ model.predict(X_val)</code></pre>
 <p class="small">Для нескольких коррелирующих признаков эти формулы по отдельности не применяются — там веса влияют друг на друга.</p>
 </section>
 
-<section id="paths" class="slide level2 demo-slide">
-<h2>Ridge и Lasso на шести признаках Auto MPG</h2>
-<div class="scene" data-scene="paths"></div>
-<aside class="notes">Ridge: веса плавно сжимаются, нулей нет. Lasso: при росте alpha веса по очереди обнуляются; при лучшем alpha остаётся 4 из 6 — выпали цилиндры и разгон. Важно: Lasso оставил массу и убрал цилиндры не потому, что цилиндры бесполезны, а потому что они дублируют массу и объём. Слишком большой штраф ухудшает качество — правая часть графика RMSE.</aside>
+<section id="paths" class="slide level2">
+<h2>Ridge и Lasso на Auto MPG: что стало с весами</h2>
+<div class="two" style="grid-template-columns:1.45fr 1fr;gap:34px">
+<div class="scene bare" data-scene="weightbars" data-w="720"></div>
+<div>
+<p class="lead" style="font-size:22px;margin-bottom:8px">Шесть признаков, все стандартизованы. Цилиндры, объём, мощность и масса сильно связаны.</p>
+<div class="line-list">
+<p><b class="muted">МНК.</b> Вес мощности <b>положительный</b> — будто мощная машина экономичнее. Так модель компенсирует похожие признаки.</p>
+<p><b class="blue">Ridge.</b> Все веса меньше по модулю, знак мощности стал естественным. Нулей нет.</p>
+<p><b class="orange">Lasso.</b> Цилиндры и разгон — <b>ровно ноль</b>: модели хватило массы и объёма.</p>
+</div>
+<p class="small">RMSE на validation: МНК 3,02 · Ridge 3,01 · Lasso 2,79 mpg. alpha у каждой модели выбран по validation.</p>
+</div>
+</div>
+<aside class="notes">Обратить внимание: знак веса у МНК при связанных признаках может быть «неправильным» — это не свойство машин, а способ модели поделить вклад между похожими столбцами. Lasso выбрал один признак из группы похожих; на другой выборке выбор может отличаться.</aside>
 </section>
 
 <section id="tune-alpha" class="slide level2">
@@ -600,14 +607,7 @@ model.predict(X_val)</code></pre>
 <div class="step"><b>3</b><p>Выбрать значение с лучшей метрикой на validation.</p></div>
 <div class="step"><b>4</b><p>Test — один раз, в самом конце.</p></div>
 </div>
-<table class="compact num">
-<tbody>
-<tr><th>Auto MPG, 6 признаков</th><th>RMSE validation</th></tr>
-<tr><td>МНК без штрафа</td><td>3,02</td></tr>
-<tr><td>Ridge, alpha = 10</td><td>3,01</td></tr>
-<tr><td>Lasso, alpha = 0,73</td><td>2,79</td></tr>
-</tbody>
-</table>
+<div class="scene bare" data-scene="alphacurve" data-w="560" style="margin-top:10px"></div>
 </div>
 <div>
 <h3>Как λ называется в scikit-learn</h3>
@@ -649,16 +649,6 @@ model.predict(X_val)</code></pre>
 </div>
 <p class="quiz-why">Цилиндры сильно коррелируют с массой и объёмом. Lasso оставляет один признак из группы похожих; какой именно — может зависеть от выборки. О причинности веса не говорят.</p>
 </div>
-</section>
-
-<section id="break" class="slide level2">
-<h2>Перед перерывом</h2>
-<div class="line-list">
-<p>Чем отличаются модель, функция потерь, способ оптимизации и метрика?</p>
-<p>Почему модель с признаком x² всё ещё называется линейной?</p>
-<p>Зачем стандартизовать признаки перед Ridge и почему дереву это не нужно?</p>
-</div>
-<p class="lead" style="margin-top:28px">Перерыв 10 минут.<br>Дальше — классификация: как из линейного score получить вероятность.</p>
 </section>
 
 <section id="part-three" class="slide level2 section-break">
@@ -986,7 +976,6 @@ b -= eta * (p - y).mean()</code></pre>
 <div class="scenario"><p class="eyebrow">Задача B</p><p>Уйдёт ли клиент. 20 000 строк, 5% ушедших, есть категории и пропуски. Метрика — ROC-AUC.</p><p class="small">Что сдавать: метки или вероятности?</p></div>
 <div class="scenario"><p class="eyebrow">Задача C</p><p>Спам или нет. Каждое письмо — 20 000 столбцов «встречается ли слово». Метрика — F1.</p><p class="small">Что выбрать после обучения модели?</p></div>
 </div>
-<p class="ask">Что общего в ваших трёх планах? Сформулируем общий порядок действий.</p>
 <aside class="notes">Слушаем зал, записываем шаги на доске, затем открываем следующий слайд. Ожидаемое: A — baseline «среднее», split, Ridge в Pipeline со StandardScaler, подбор alpha, потом бустинг. B — стратифицированный split, вероятности (predict_proba), логрег с one-hot и импутацией, затем бустинг; accuracy не смотреть. C — логрег с L1 или L2 на разреженных признаках, порог подобрать по F1 на validation.</aside>
 </section>
 
@@ -1002,7 +991,6 @@ b -= eta * (p - y).mean()</code></pre>
 <div><b>07</b><h3>Сильная модель</h3><p>Бустинг. Сравниваем по той же схеме и той же метрике.</p></div>
 <div><b>08</b><h3>Финал</h3><p>Test — один раз. Записать, что пробовали и что получилось.</p></div>
 </div>
-<p class="takeaway">Эта шпаргалка будет в ноутбуке домашнего задания.</p>
 </section>
 
 <section id="thanks" class="slide level2 cover thanks">
@@ -1010,7 +998,6 @@ b -= eta * (p - y).mean()</code></pre>
 <div class="cover-layout">
   <div class="cover-text">
     <p class="lead">Вопросы?</p>
-    <p class="cover-meta">Дальше — семинар: МНК руками и в NumPy, градиентный спуск, Ridge и Lasso, логистическая регрессия и выбор порога.</p>
   </div>
   <div class="cover-art" data-scene="coverlogit"></div>
 </div>

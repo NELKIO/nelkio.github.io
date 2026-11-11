@@ -192,3 +192,11 @@ html.print-pdf .quiz .quiz-options button.right::before{background:var(--green);
 .reveal .compact-panel h3{font-size:21px;margin-bottom:2px}
 .reveal .compact-panel .equation{margin:4px 0;font-size:24px}
 .reveal .compact-panel .small{font-size:18px;margin:2px 0 0}
+
+.reveal #paths .line-list p{font-size:22px;line-height:1.38;padding:10px 0}
+.reveal #scenarios .three{margin-top:30px}
+.reveal #scenarios .scenario{padding:26px 26px 28px;min-height:300px;box-sizing:border-box}
+.reveal #scenarios .scenario p{font-size:26px}
+.reveal #scenarios .scenario .small{font-size:21px;margin-top:16px}
+.reveal #pipeline .flow{margin-top:24px;gap:20px}
+.reveal #pipeline .flow>div{min-height:225px}
