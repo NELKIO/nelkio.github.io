@@ -142,6 +142,33 @@
     draw(-10);
   };
 
+  // ---------- шаги спуска по параболе ошибки ----------
+  S.gdsteps = root => {
+    const bar = controls(root), n = note(root);
+    const xs = sm.train[0], ys = sm.train[1], b = sm.b;
+    const J = w => 0.5 * mean(xs.map((x, i) => (w * x + b - ys[i]) ** 2));
+    const dJ = w => mean(xs.map((x, i) => (w * x + b - ys[i]) * x));
+    const ws = range(-11, -4.9, 120);
+    const P = plot(root, { w: 700, h: 360, x: [-11, -4.9], y: [0, Math.max(J(-11), J(-4.9)) * 1.05], xl: 'наклон w', yl: 'ошибка J', xf: v => fmt(v, 0) });
+    root.insertBefore(P.svg, n);
+    P.line(ws, ws.map(J), { stroke: C.ink, layer: P.back });
+    P.mark(sm.w, J(sm.w), { fill: C.green, r: 6, layer: P.back });
+    let eta = 0.05, steps = 5;
+    function draw() {
+      P.clear();
+      let w = -10.5; const path = [w];
+      for (let i = 0; i < steps; i++) { w = w - eta * dJ(w); path.push(w); }
+      const vis = path.filter(v => v > -11.5 && v < -4.4);
+      for (let i = 1; i < vis.length; i++) P.seg(vis[i - 1], J(vis[i - 1]), vis[i], J(vis[i]), { stroke: C.orange, 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+      vis.forEach((v, i) => P.mark(v, J(v), { r: i === vis.length - 1 ? 7 : 4.5, fill: C.orange }));
+      const last = path[path.length - 1], gone = !isFinite(J(last)) || J(last) > 1e3 || last < -11.5 || last > -4.4;
+      n.innerHTML = `Старт w = −10,5 · после ${steps} шагов w = <b>${gone ? 'улетел' : fmt(last, 2)}</b>, J = <b>${gone ? 'растёт' : fmt(J(last), 2)}</b> · минимум: w = ${fmt(sm.w)}, J = ${fmt(J(sm.w), 2)}`;
+    }
+    seg(bar, 'Шаг η', [0.02, 0.05, 0.15, 0.21].map(v => ({ label: fmt(v, 2), value: v })), eta, v => { eta = v; draw(); });
+    slider(bar, { label: 'Шагов', min: 0, max: 15, step: 1, value: steps, fmt: v => v, on: v => { steps = v; draw(); } });
+    draw();
+  };
+
   // ---------- градиентный спуск ----------
   S.gd = root => {
     const bar = controls(root), ps = panels(root), n = note(root);
@@ -295,7 +322,7 @@
       h('text', { x: 60, y: Q.sy(y) + 5, 'text-anchor': 'end', 'font-size': 16, fill: col, 'font-weight': 600 }, Q.svg, l);
       Q.dots(car[k], car[k].map(() => y + (rnd() - 0.5) * 0.4), { fill: col, r: 3.5, opacity: .85 });
     });
-    h('p', { class: 'scene-note', html: `${car.name.replace(/\b\w/g, ch => ch.toUpperCase())}: разброс прогноза <b>${fmt(sd(car.ols))}</b> mpg у МНК и <b>${fmt(sd(car.ridge))}</b> у Ridge. Вес массы у МНК при этом меняется от ${fmt(Math.min(...c.ols.map(v => v[0])), 1)} до ${fmt(Math.max(...c.ols.map(v => v[0])), 1)}.` }, right);
+    h('p', { class: 'scene-note', html: `Одна машина validation: разброс прогноза <b>${fmt(sd(car.ols))}</b> mpg у МНК и <b>${fmt(sd(car.ridge))}</b> у Ridge. Вес массы у МНК при этом меняется от ${fmt(Math.min(...c.ols.map(v => v[0])), 1)} до ${fmt(Math.max(...c.ols.map(v => v[0])), 1)}.` }, right);
     h('p', { class: 'scene-caption', html: 'Каждая точка — одна модель, обученная на бутстреп-выборке train (выбор строк с возвращением). Масштабирование обучено на train.' }, right);
   };
 
@@ -442,7 +469,7 @@
       cm.innerHTML = `<div class="h"></div><div class="h">модель: 1</div><div class="h">модель: 0</div>
         <div class="h">ответ: 1</div><div class="ok">TP<b>${m.tp}</b></div><div class="bad">FN<b>${m.fn}</b></div>
         <div class="h">ответ: 0</div><div class="bad">FP<b>${m.fp}</b></div><div class="ok">TN<b>${m.tn}</b></div>`;
-      rows.innerHTML = [['Precision', fmt(m.prec, 3)], ['Recall', fmt(m.rec, 3)], ['F1', fmt(m.f1, 3)], ['Стоимость FP + 5·FN', m.cost], ['ROC-AUC (не зависит от порога)', fmt(d.auc, 3)]].map(r => `<p class="metric-row"><span>${r[0]}</span><b>${r[1]}</b></p>`).join('');
+      rows.innerHTML = [['Precision', fmt(m.prec, 3)], ['Recall', fmt(m.rec, 3)], ['F1', fmt(m.f1, 3)], ['Стоимость FP + 5·FN', m.cost]].map(r => `<p class="metric-row"><span>${r[0]}</span><b>${r[1]}</b></p>`).join('');
     }
     const sl = slider(bar, { label: 'Порог t: класс 1, если p ≥ t', min: 0.01, max: 0.99, step: 0.01, value: 0.5, on: draw });
     [['t = 0,5', 0.5], [`минимум стоимости: ${fmt(bestCost)}`, bestCost], [`максимум F1: ${fmt(bestF1)}`, bestF1]].forEach(([l, t]) => button(bar, l, () => { sl.set(t); draw(t); }));

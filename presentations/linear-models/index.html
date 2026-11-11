@@ -246,7 +246,7 @@
 <section id="many-features" class="slide level2">
 <h2>Несколько признаков: прогноз — сумма вкладов</h2>
 <div class="equation" data-tex="\hat y=w_1x_1+w_2x_2+\dots+w_dx_d+b=w\cdot x+b" data-display=""></div>
-<p>Модель на трёх признаках. Машина из validation: Dodge Aspen 1979 года, 3360 фунтов, 110 л. с.</p>
+<p>Модель на трёх признаках. Одна машина из validation: 3360 фунтов, 110 л. с., 1979 год.</p>
 <table class="compact num">
 <tbody>
 <tr><th>Признак</th><th>Значение x</th><th>Вес w</th><th>Вклад w · x</th></tr>
@@ -299,8 +299,8 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <table class="compact num">
 <tbody>
 <tr><th>Машина</th><th>y</th><th>ŷ</th><th>r</th></tr>
-<tr><td>Honda Civic 1300</td><td>35,1</td><td>33,35</td><td>−1,75</td></tr>
-<tr><td>Chevrolet Vega (sw)</td><td>22,0</td><td>28,21</td><td>+6,21</td></tr>
+<tr><td>1760 фунтов</td><td>35,1</td><td>33,35</td><td>−1,75</td></tr>
+<tr><td>2408 фунтов</td><td>22,0</td><td>28,21</td><td>+6,21</td></tr>
 </tbody>
 </table>
 <p class="small">На графике восемь машин из validation. Сегодня остаток всегда «прогноз минус ответ».</p>
@@ -334,45 +334,21 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <aside class="notes">Подвигать ползунок: касательная к параболе наклоняется, её наклон — производная. В точке минимума касательная горизонтальна. Это и есть условие, по которому МНК находит веса. Отсюда же два пути: решить уравнение «производная = 0» или шагать против производной — градиентный спуск.</aside>
 </section>
 
-<section id="system" class="slide level2">
-<h2>Производные равны нулю — это система линейных уравнений</h2>
-<p class="lead">Для одного признака две неизвестные, w и b, и две производные. Приравняем обе к нулю и разделим на n:</p>
-<div class="two" style="gap:34px">
+<section id="gradient" class="slide level2 demo-slide">
+<h2>Градиентный спуск: шагаем против производной</h2>
+<div class="two" style="grid-template-columns:1fr 1.5fr;gap:30px">
 <div>
-<div class="equation accent" data-tex="\begin{cases}\overline{x^2}\cdot w+\bar x\cdot b=\overline{xy}\\[2pt] \bar x\cdot w+b=\bar y\end{cases}" data-display=""></div>
-<p class="small">Черта — среднее по train. Коэффициенты считаются по всей выборке, а дальше — обычная школьная система.</p>
-<p style="margin-bottom:4px"><b>Auto MPG</b>, масса → экономичность:</p>
-<div class="equation plain math-small" data-tex="\begin{cases}9{,}80\,w+3{,}02\,b=65{,}06\\[2pt] 3{,}02\,w+b=23{,}35\end{cases}\;\Rightarrow\; w=-7{,}94,\;b=47{,}32" data-display=""></div>
-</div>
-<div class="panel">
-<h3>Руками: точки (0; 1), (1; 2), (2; 2)</h3>
-<p><span data-tex="\bar x=1,\;\bar y=\tfrac53,\;\overline{x^2}=\tfrac53,\;\overline{xy}=2"></span></p>
-<div class="equation plain math-small" data-tex="\begin{cases}\tfrac53w+b=2\\[2pt] w+b=\tfrac53\end{cases}\;\Rightarrow\;\tfrac23w=\tfrac13\;\Rightarrow\;w=\tfrac12,\;b=\tfrac76" data-display=""></div>
-<p class="small">Этот пример пересчитаем на семинаре в NumPy.</p>
-</div>
-</div>
-<div class="bridge-rule">Для d признаков — система из d + 1 уравнения: <span data-tex="A\theta=c"></span>, где <span data-tex="A=\tilde X^{\top}\tilde X,\;c=\tilde X^{\top}y"></span>. Её и решает <code>LinearRegression().fit(X, y)</code>.</div>
-<aside class="notes">Вывод формулы наклона через центрирование не делаем. Достаточно: J — парабола, в минимуме производные нулевые, получается система Aθ = c, её решает библиотека. Если спросят про обратную матрицу: θ = A⁻¹c работает, когда признаки не дублируют друг друга; в коде вызывают устойчивый решатель (np.linalg.lstsq).</aside>
-</section>
-
-<section id="gradient" class="slide level2">
-<h2>Другой путь к тому же минимуму: градиентный спуск</h2>
-<p class="lead">Производная по каждому весу — среднее произведение остатка на признак.</p>
-<div class="two">
-<div>
-<div class="equation" data-tex="\frac{\partial J}{\partial w_j}=\frac1n\sum_{i=1}^{n} r_i\,x_{ij}\qquad \frac{\partial J}{\partial b}=\frac1n\sum_{i=1}^{n} r_i" data-display=""></div>
-<div class="equation accent" data-tex="\nabla_w J=\frac{1}{n}X^{\top}r" data-display=""></div>
-</div>
-<div>
-<pre><code>w, b = np.zeros(d), 0.0
-for step in range(n_steps):
-    r = X @ w + b - y          <span class="c"># остатки</span>
+<div class="equation accent center" data-tex="w\;\leftarrow\;w-\eta\cdot\frac{dJ}{dw}" data-display=""></div>
+<p>Производная отрицательна — вес увеличиваем, положительна — уменьшаем. <span data-tex="\eta"></span> — размер шага, как <code>learning_rate</code> в бустинге.</p>
+<p>Весов много — каждый двигаем против своей производной. Производная по весу — среднее «остаток × признак».</p>
+<pre class="code-small"><code>for step in range(100):
+    r = X @ w + b - y        <span class="c"># остатки</span>
     w -= eta * X.T @ r / len(y)
     b -= eta * r.mean()</code></pre>
-<p class="small"><span data-tex="\eta"></span> — размер шага, как <code>learning_rate</code> в бустинге.</p>
 </div>
+<div class="scene" data-scene="gdsteps"></div>
 </div>
-<div class="bridge-rule">Объект сильнее двигает вес, если у него большая ошибка <b>и</b> большое значение признака.</div>
+<aside class="notes">Та же парабола, что на прошлом слайде. Показать: η = 0,02 — медленно ползём; 0,05 — спокойно приходим; 0,15 — перескакиваем минимум, но сходимся; 0,21 — каждый перескок больше прошлого, улетаем. Формула производной по весу: (1/n)·Σ rᵢ·xᵢⱼ — в коде это X.T @ r / n.</aside>
 </section>
 
 <section id="gd-demo" class="slide level2 demo-slide">
@@ -385,7 +361,7 @@ for step in range(n_steps):
 <section id="ols-vs-gd" class="slide level2">
 <h2>МНК — цель, градиентный спуск — способ</h2>
 <div class="two">
-<div class="panel"><p class="eyebrow">Точное решение</p><h3><code>LinearRegression</code></h3><p>Решает систему уравнений за один вызов.</p><p>Нет шага и числа итераций. Масштаб признаков на прогнозы не влияет.</p><p class="small">Подходит, пока таблица помещается в память.</p></div>
+<div class="panel"><p class="eyebrow">Точное решение</p><h3><code>LinearRegression</code></h3><p>Находит минимум сразу, без шагов: решает систему «все производные равны нулю».</p><p>Нет шага и числа итераций. Масштаб признаков на прогнозы не влияет.</p><p class="small">Подходит, пока таблица помещается в память.</p></div>
 <div class="panel"><p class="eyebrow">Итерации</p><h3>Градиентный спуск, <code>SGDRegressor</code></h3><p>Двигается к минимуму небольшими шагами.</p><p>Нужны шаг <span data-tex="\eta"></span> и стандартизация признаков.</p><p class="small">Работает на очень больших данных и с любой дифференцируемой потерей — так обучается логрег и нейросети.</p></div>
 </div>
 <p class="takeaway">Если спуск сошёлся, прогнозы совпадают с точным решением: минимизируем одну и ту же функцию <span data-tex="J"></span>.</p>
@@ -466,7 +442,7 @@ for step in range(n_steps):
 <div class="panel compact-panel"><h3>Стандартизация · <code>StandardScaler</code></h3><div class="equation plain math-small" data-tex="x'=\frac{x-\bar x}{s_x}:\quad\text{среднее }0,\ \text{разброс }1" data-display=""></div><p class="small">Основной выбор для линейных моделей.</p></div>
 </div>
 <div class="scene bare" data-scene="scaling" style="margin-top:14px"></div>
-<p class="scene-caption">Auto MPG, 233 машины train с известной мощностью. На общей оси в исходных единицах мощность и разгон почти не видны: их числа в десятки раз меньше массы. Dodge Aspen, 3360 фунтов: нормализация (3,36 − 1,61) / (5,14 − 1,61) = 0,50, стандартизация (3,36 − 3,02) / 0,83 = 0,41.</p>
+<p class="scene-caption">Auto MPG, 233 машины train с известной мощностью. На общей оси в исходных единицах мощность и разгон почти не видны: их числа в десятки раз меньше массы. Машина 3360 фунтов: нормализация (3,36 − 1,61) / (5,14 − 1,61) = 0,50, стандартизация (3,36 − 3,02) / 0,83 = 0,41.</p>
 </section>
 
 <section id="regularization-intro" class="slide level2">
@@ -682,15 +658,25 @@ model.predict(X_val)</code></pre>
 </section>
 
 <section id="likelihood" class="slide level2">
-<h2>Как обучать: вероятность правильного ответа</h2>
-<p class="lead">Хорошая модель даёт высокую вероятность тому классу, который был на самом деле.</p>
-<div class="steps">
-<div class="step"><b>1</b><div><p>Вероятность наблюдаемого ответа для одного объекта: <span data-tex="p_i"></span>, если <span data-tex="y_i=1"></span>, и <span data-tex="1-p_i"></span>, если <span data-tex="y_i=0"></span>. Одной формулой:</p><div class="equation plain math-small" data-tex="P(y_i\mid x_i)=p_i^{\,y_i}(1-p_i)^{1-y_i}" data-display=""></div></div></div>
-<div class="step"><b>2</b><p>Для всей выборки вероятности перемножаются. Хотим максимум этого произведения — правдоподобия.</p></div>
-<div class="step"><b>3</b><p>Логарифм превращает произведение в сумму. Минус и деление на <span data-tex="n"></span> — получаем функцию потерь для минимизации.</p></div>
+<h2>Как обучать логрег: штраф за каждый объект</h2>
+<p class="lead">Смотрим, какую вероятность модель дала правильному классу. Чем она меньше, тем больше штраф.</p>
+<div class="two" style="grid-template-columns:1fr 1.1fr;gap:34px">
+<div>
+<div class="equation accent center" data-tex="\text{штраф}=-\ln\bigl(\text{вероятность правильного класса}\bigr)" data-display=""></div>
+<p>Если ответ 1 — берём <span data-tex="p"></span>, если 0 — берём <span data-tex="1-p"></span>. Средний штраф по train — функция потерь <b>log loss</b>, её и минимизируем.</p>
+<div class="equation math-small" data-tex="J=-\frac1n\sum_{i=1}^{n}\Bigl[y_i\ln p_i+(1-y_i)\ln(1-p_i)\Bigr]" data-display=""></div>
 </div>
-<div class="equation accent center" data-tex="J=-\frac1n\sum_{i=1}^{n}\Bigl[y_i\ln p_i+(1-y_i)\ln(1-p_i)\Bigr]" data-display=""></div>
-<p class="small">Это <b>log loss</b>, он же логистическая функция потерь и бинарная кросс-энтропия.</p>
+<table class="num">
+<tbody>
+<tr><th>Ответ y</th><th>Модель: p</th><th>Вероятность правильного</th><th>Штраф</th></tr>
+<tr><td>1</td><td>0,9</td><td>0,9</td><td>0,105</td></tr>
+<tr><td>0</td><td>0,2</td><td>0,8</td><td>0,223</td></tr>
+<tr><td>1</td><td>0,3</td><td>0,3</td><td>1,204</td></tr>
+<tr class="hl"><td colspan="3"><b>Log loss — средний штраф</b></td><td><b>0,511</b></td></tr>
+</tbody>
+</table>
+</div>
+<aside class="notes">Откуда логарифм: хотим, чтобы вероятность всех правильных ответов сразу (произведение pᵢ) была максимальной. Логарифм превращает произведение в сумму, минус — максимум в минимум. Это и есть log loss, он же бинарная кросс-энтропия. Знаком по бустингу.</aside>
 </section>
 
 <section id="logloss-demo" class="slide level2">
@@ -716,23 +702,28 @@ model.predict(X_val)</code></pre>
 </section>
 
 <section id="logreg-gradient" class="slide level2">
-<h2>Градиент логрега: снова «прогноз минус ответ»</h2>
-<p>Для одного объекта: <span data-tex="\ell=-y\ln p-(1-y)\ln(1-p)"></span>, где <span data-tex="p=\sigma(z)"></span>. Правило цепочки:</p>
-<div class="equation" data-tex="\frac{\partial \ell}{\partial z}=\underbrace{\left(-\frac{y}{p}+\frac{1-y}{1-p}\right)}_{\partial\ell/\partial p}\cdot\underbrace{p\,(1-p)}_{\partial p/\partial z}=p-y" data-display=""></div>
-<div class="two">
+<h2>Обучение логрега: снова «прогноз минус ответ»</h2>
+<p class="lead">Минимум log loss формулой не найти — только градиентным спуском. Производная по score получается удивительно простой:</p>
+<div class="equation accent center" data-tex="\frac{d\,\text{штраф}}{dz}=p-y" data-display=""></div>
+<div class="two" style="gap:34px">
+<table class="compact num">
+<tbody>
+<tr><th>y</th><th>p</th><th>p − y</th><th>Что делает спуск</th></tr>
+<tr><td>1</td><td>0,9</td><td>−0,1</td><td style="text-align:left">чуть поднимает score</td></tr>
+<tr><td>1</td><td>0,3</td><td>−0,7</td><td style="text-align:left">сильно поднимает score</td></tr>
+<tr><td>0</td><td>0,8</td><td>+0,8</td><td style="text-align:left">сильно опускает score</td></tr>
+</tbody>
+</table>
 <div>
-<div class="equation accent" data-tex="\nabla_w J=\frac1n X^{\top}(p-y)" data-display=""></div>
-<p class="small">Сравните с линейной регрессией: <span data-tex="\nabla_wJ=\tfrac1n X^{\top}(\hat y-y)"></span>. Код спуска отличается одной строкой.</p>
-</div>
-<div>
-<pre><code>z = X @ w + b
-p = 1 / (1 + np.exp(-z))      <span class="c"># новая строка</span>
+<pre class="code-small"><code>z = X @ w + b
+p = 1 / (1 + np.exp(-z))     <span class="c"># единственное отличие</span>
 w -= eta * X.T @ (p - y) / len(y)
 b -= eta * (p - y).mean()</code></pre>
+<p class="small">У линейной регрессии на этом месте стоял остаток <span data-tex="\hat y-y"></span>.</p>
 </div>
 </div>
-<div class="bridge-rule">В бустинге для классификации новое дерево обучали на <span data-tex="y-p"></span>. Это тот же градиент с обратным знаком.</div>
-<aside class="notes">Точной формулы, как у МНК, здесь нет: уравнение «градиент равен нулю» не решается в явном виде, поэтому логрег всегда обучают итерациями.</aside>
+<div class="bridge-rule">В бустинге для классификации новое дерево обучали на <span data-tex="y-p"></span> — это тот же сигнал с обратным знаком.</div>
+<aside class="notes">Если спросят, откуда p − y: правило цепочки, d штраф/dp = −y/p + (1−y)/(1−p), dp/dz = p(1−p), произведение сокращается до p − y.</aside>
 </section>
 
 <section id="digits" class="slide level2">
@@ -754,19 +745,26 @@ b -= eta * (p - y).mean()</code></pre>
 <p>64 веса — по одному на пиксель. Разложим их в ту же сетку 8×8.</p>
 <p>Оранжевые пиксели — в левой половине. У восьмёрки там левые стороны петель, у тройки пусто: если пиксель там ярче обычного, score «8» растёт.</p>
 <div class="equation math-small" data-tex="z=b+\sum_{j=1}^{64}w_j\cdot\frac{\text{яркость}_j-\text{средняя}_j}{\text{разброс}_j}" data-display=""></div>
-<p class="small">Модель видит не саму яркость, а стандартизованную: насколько пиксель ярче или темнее своего среднего на train. Та же сумма вкладов плюс свободный член, что и в прогнозе для Dodge Aspen. Это описание модели, а не «объяснение» того, как устроены цифры.</p>
+<p class="small">Яркость каждого пикселя стандартизована по train, b — свободный член.</p>
 </div>
 </div>
 <aside class="notes">Спросить зал: где у тройки чернила, а у восьмёрки нет, и наоборот? Оранжевые пиксели слева в середине — левая сторона петель восьмёрки, у тройки там пусто.</aside>
 </section>
 
 <section id="separable" class="slide level2">
-<h2>Без штрафа веса логрега растут</h2>
-<p class="lead">Если классы на train разделяются прямой, модели выгодно увеличивать веса: вероятности уходят к 0 и 1, log loss на train стремится к нулю.</p>
-<div class="two wide-left">
+<h2>Логрегу тоже нужен штраф за большие веса</h2>
+<p class="lead">Если классы на train разделяются прямой, без штрафа модели выгодно бесконечно увеличивать веса: вероятности уходят к 0 и 1, log loss на train стремится к нулю.</p>
+<div class="two wide-right" style="grid-template-columns:1fr 1.25fr;gap:34px">
+<div>
+<p>Поэтому в <code>LogisticRegression</code> L2-штраф, как в Ridge, включён по умолчанию.</p>
+<p>Его силу задаёт параметр <code>C</code> — <b>обратная</b> сила штрафа:</p>
+<p class="bridge-rule" style="margin:8px 0">больше <code>C</code> — слабее штраф, веса больше.<br>меньше <code>C</code> — сильнее штраф, веса меньше.</p>
+<p class="small">По умолчанию <code>C = 1</code>. Подбираем по validation, как alpha у Ridge.</p>
+</div>
+<div>
 <table class="compact num">
 <tbody>
-<tr><th>C</th><th>Длина вектора весов</th><th>Log loss train</th><th>Log loss validation</th></tr>
+<tr><th>C</th><th>Величина весов ‖w‖</th><th>Log loss train</th><th>Log loss validation</th></tr>
 <tr><td>0,01</td><td>0,69</td><td>0,203</td><td>0,210</td></tr>
 <tr><td>0,1</td><td>1,57</td><td>0,060</td><td>0,084</td></tr>
 <tr><td>1</td><td>2,93</td><td>0,013</td><td>0,043</td></tr>
@@ -775,34 +773,20 @@ b -= eta * (p - y).mean()</code></pre>
 <tr><td>10 000</td><td>7,62</td><td>0,0002</td><td>0,038</td></tr>
 </tbody>
 </table>
-<div>
-<p><code>C</code> — <b>обратная</b> сила штрафа: больше <code>C</code> — слабее ограничение.</p>
-<p>Train-ошибка падает всё время. Validation — лучшая при <code>C = 10</code>, дальше модель становится самоувереннее и чуть хуже.</p>
-<p class="small">Digits, 3 против 8. В <code>LogisticRegression</code> L2-штраф включён по умолчанию, <code>C = 1</code>.</p>
+<p class="small">Цифры 3 и 8. С ростом C веса растут, ошибка на train падает до нуля, а на validation лучшая — при C = 10.</p>
 </div>
 </div>
 </section>
 
 <section id="three-metrics" class="slide level2">
-<h2>Три вопроса к классификатору — три метрики</h2>
-<table>
-<tbody>
-<tr><th>Вопрос</th><th>Метрика</th><th>Что подаём на вход</th></tr>
-<tr><td>Хороши ли сами вероятности?</td><td><b>Log loss</b> ↓</td><td>вероятности</td></tr>
-<tr><td>Правильно ли модель упорядочивает объекты?</td><td><b>ROC-AUC</b> ↑</td><td>вероятности или score</td></tr>
-<tr><td>Хороши ли решения после порога?</td><td><b>Precision, recall, F1</b> ↑</td><td>метки классов</td></tr>
-</tbody>
-</table>
-<p><b>Пример.</b> Сделаем модель самоувереннее: умножим все score на 3. Порядок объектов не изменится.</p>
-<table class="compact num">
-<tbody>
-<tr><th>Ответ y</th><th>0</th><th>1</th><th>0</th><th>1</th><th>ROC-AUC</th><th>Log loss</th></tr>
-<tr><td>Вероятности p</td><td>0,10</td><td>0,40</td><td>0,60</td><td>0,90</td><td>0,75</td><td>0,511</td></tr>
-<tr><td>После умножения score на 3</td><td>0,001</td><td>0,229</td><td>0,771</td><td>0,999</td><td>0,75</td><td>0,739</td></tr>
-</tbody>
-</table>
-<p class="takeaway">Одинаковый ROC-AUC не означает одинаковые вероятности. Модель стала увереннее и там, где ошибается.</p>
-<aside class="notes">На Digits: ROC-AUC на validation 1,000, log loss 0,033, F1 0,986 при пороге 0,5 — одна ошибка (FP) при идеальном ранжировании. В ROC-AUC нельзя подавать метки после порога — теряется порядок.</aside>
+<h2>Что оцениваем: вероятности или решения</h2>
+<p class="lead">Логрег выдаёт вероятности, а решение — класс — получается после порога. Оценивать можно и то, и другое.</p>
+<div class="two">
+<div class="panel"><p class="eyebrow">Вероятности</p><h3>Log loss ↓</h3><p>Насколько уверенно модель ставит правильный класс. Наказывает уверенные ошибки.</p><p class="small">На вход — <code>predict_proba</code>. От порога не зависит.</p></div>
+<div class="panel"><p class="eyebrow">Решения после порога</p><h3>Precision, recall, F1 ↑</h3><p>Сколько ошибок каждого вида среди меток 0 и 1.</p><p class="small">На вход — метки. Меняются при смене порога.</p></div>
+</div>
+<p><b>Цифры 3 и 8, validation:</b> log loss 0,033; при пороге 0,5 F1 = 0,986, одна ошибка — тройка, принятая за восьмёрку.</p>
+<p class="takeaway">Хорошие вероятности ещё не значат хорошие решения при пороге 0,5. Порог выбирают отдельно.</p>
 </section>
 
 <section id="threshold-demo" class="slide level2 demo-slide">
@@ -946,7 +930,7 @@ b -= eta * (p - y).mean()</code></pre>
 <p class="lead">Три постановки. Для каждой назовите первые три действия.</p>
 <div class="three">
 <div class="scenario"><p class="eyebrow">Задача A</p><p>Цена квартиры. 500 объектов, 12 числовых признаков. Метрика — RMSE.</p><p class="small">Что предсказывать «в лоб»? Какую модель первой?</p></div>
-<div class="scenario"><p class="eyebrow">Задача B</p><p>Уйдёт ли клиент. 20 000 строк, 5% ушедших, есть категории и пропуски. Метрика — ROC-AUC.</p><p class="small">Что сдавать: метки или вероятности?</p></div>
+<div class="scenario"><p class="eyebrow">Задача B</p><p>Уйдёт ли клиент. 20 000 строк, 5% ушедших, есть категории и пропуски. Метрика — log loss.</p><p class="small">Что сдавать: метки или вероятности?</p></div>
 <div class="scenario"><p class="eyebrow">Задача C</p><p>Спам или нет. Каждое письмо — 20 000 столбцов «встречается ли слово». Метрика — F1.</p><p class="small">Что выбрать после обучения модели?</p></div>
 </div>
 <aside class="notes">Слушаем зал, записываем шаги на доске, затем открываем следующий слайд. Ожидаемое: A — baseline «среднее», split, Ridge в Pipeline со StandardScaler, подбор alpha, потом бустинг. B — стратифицированный split, вероятности (predict_proba), логрег с one-hot и импутацией, затем бустинг; accuracy не смотреть. C — логрег с L1 или L2 на разреженных признаках, порог подобрать по F1 на validation.</aside>
