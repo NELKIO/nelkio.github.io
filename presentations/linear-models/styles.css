@@ -204,3 +204,11 @@ html.print-pdf .quiz .quiz-options button.right::before{background:var(--green);
 .reveal #comparison table{font-size:19px}
 .reveal #comparison td,.reveal #comparison th{padding:6px 10px}
 .reveal #comparison .small{margin:6px 0 0;font-size:18px}
+.scene-controls input.num-in{width:92px;font:600 17px var(--font);padding:4px 8px;border:1px solid var(--line);border-radius:7px;font-variant-numeric:tabular-nums}
+.panel-art{display:grid;grid-template-columns:1fr 250px;gap:18px;align-items:center}
+.panel-art .mini svg{width:100%;display:block}
+.vs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.vs .panel{padding:16px 20px}
+.reveal .vs .panel p{font-size:21px;margin:6px 0}
+.reveal .vs .panel .equation{font-size:22px;margin:6px 0;padding:10px 12px}
+.reveal .eq-steps .equation{margin:6px 0;padding:10px 16px}

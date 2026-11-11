@@ -78,11 +78,18 @@
     const lab = h('label', {}, bar);
     h('span', {}, lab, o.label);
     const inp = h('input', { type: 'range', min: o.min, max: o.max, step: o.step, value: o.value }, lab);
-    const out = h('output', {}, lab);
-    const show = () => { out.textContent = (o.fmt || (v => fmt(v, 2)))(+inp.value); };
-    inp.addEventListener('input', () => { show(); o.on(+inp.value); });
-    show();
-    return { get: () => +inp.value, set: v => { inp.value = v; show(); } };
+    // o.num: вместо подписи — поле, куда можно вписать точное число
+    const out = h(o.num ? 'input' : 'output', o.num ? { type: 'number', step: 'any', min: o.min, max: o.max, class: 'num-in' } : {}, lab);
+    const show = v => { const s = (o.fmt || (x => fmt(x, 2)))(v); if (o.num) out.value = +(+v).toFixed(4); else out.textContent = s; };
+    inp.addEventListener('input', () => { show(+inp.value); o.on(+inp.value); });
+    if (o.num) out.addEventListener('change', () => {
+      const raw = String(out.value).trim().replace(',', '.');
+      if (raw === '' || !isFinite(+raw)) return show(+inp.value);
+      const v = Math.min(o.max, Math.max(o.min, +raw));
+      inp.value = v; show(v); o.on(v);
+    });
+    show(+o.value);
+    return { get: () => +inp.value, set: v => { inp.value = v; show(v); } };
   }
 
   function seg(bar, label, items, value, on) {

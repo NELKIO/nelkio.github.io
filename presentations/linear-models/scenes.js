@@ -53,6 +53,81 @@
     pts.forEach(([z, y, j]) => h('circle', { cx: sx(z), cy: (y ? top - 40 : bot + 40) + j * 0.5, r: 6.5, fill: y ? C.orange : C.blue, 'fill-opacity': .9, stroke: '#fff', 'stroke-width': 1.5 }, svg));
   };
 
+  // ---------- мини-картинки: одна прямая против прямоугольников дерева ----------
+  S.minisplit = root => {
+    const b = D.blobs, tree = root.dataset.kind === 'tree';
+    const P = plot(root, { w: 300, h: 190, x: [-4, 4.5], y: [-3.6, 4], xt: [], yt: [], grid: false, m: { l: 4, r: 4, t: 4, b: 4 } });
+    P.svg.querySelectorAll('line').forEach(l => l.remove());
+    h('rect', { x: 4, y: 4, width: 292, height: 182, fill: 'none', stroke: '#c5ccd4', rx: 6 }, P.svg);
+    if (tree) {
+      const nx = b.gx.length, ny = b.gy.length, dx = b.gx[1] - b.gx[0], dy = b.gy[1] - b.gy[0];
+      for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+        const p = b.tree[j * nx + i];
+        P.rect(b.gx[i] - dx / 2, b.gy[j] - dy / 2, b.gx[i] + dx / 2, b.gy[j] + dy / 2, { fill: p >= 0.5 ? 'rgba(213,103,61,.2)' : 'rgba(38,127,208,.14)', 'shape-rendering': 'crispEdges' });
+      }
+    } else {
+      const yAt = x => (-b.b - b.w[0] * x) / b.w[1];
+      P.line([-4, 4.5], [yAt(-4), yAt(4.5)], { stroke: C.ink, 'stroke-width': 3 });
+    }
+    b.label.forEach((v, i) => P.dots([b.x[i]], [b.y[i]], { fill: v ? C.orange : C.blue, r: 2.6, opacity: .85, layer: P.back }));
+  };
+
+  // ---------- два признака: плоскость в пространстве ----------
+  S.plane = root => {
+    const d = D.plane, bar = controls(root), W = +root.dataset.w || 620, H = +root.dataset.h || 430;
+    const svg = h('svg', { viewBox: `0 0 ${W} ${H}`, class: 'plot' }, root);
+    const U = [1.5, 5.2], V = [0, 12], T = [0, 48];
+    const f = (x1, x2) => d.b + d.coef[0] * x1 + d.coef[1] * x2;
+    const S0 = W * 0.62, el = 0.4, cx = W / 2 + 14, cy = H * 0.5, sz = H * 0.6;
+    let a = 0.6;
+    const pr = (x1, x2, y) => {
+      const u = (x1 - U[0]) / (U[1] - U[0]) - 0.5, v = (x2 - V[0]) / (V[1] - V[0]) - 0.5, t = (y - T[0]) / (T[1] - T[0]) - 0.5;
+      const px = u * Math.cos(a) - v * Math.sin(a), dp = u * Math.sin(a) + v * Math.cos(a);
+      return [cx + S0 * px, cy - sz * t - S0 * el * dp, dp];
+    };
+    const pts = d.x1.map((x1, i) => ({ x1, x2: d.x2[i], y: d.y[i] }));
+    function draw() {
+      svg.replaceChildren();
+      const g = (tag, at) => h(tag, at, svg);
+      const P = (x1, x2, y) => pr(x1, x2, y).slice(0, 2).map(v => v.toFixed(1)).join(' ');
+      // пол и оси
+      g('path', { d: `M${P(U[0], V[0], T[0])}L${P(U[1], V[0], T[0])}L${P(U[1], V[1], T[0])}L${P(U[0], V[1], T[0])}Z`, fill: '#f6f7f9', stroke: '#dfe3e8' });
+      const line = (a1, a2, st) => g('line', Object.assign({ x1: a1[0], y1: a1[1], x2: a2[0], y2: a2[1], stroke: '#9aa3ad', 'stroke-width': 1.5 }, st || {}));
+      const lab = (pt, s, dx, dy, an) => { g('text', { x: pt[0] + dx, y: pt[1] + dy, 'text-anchor': an, 'font-size': 15, fill: C.muted }).textContent = s; };
+      // передний угол пола — откуда идут оси массы и года; ось mpg — в самом левом углу
+      const corners = [[U[0], V[0]], [U[1], V[0]], [U[1], V[1]], [U[0], V[1]]];
+      const front = corners.reduce((m, c) => pr(c[0], c[1], 0)[2] < pr(m[0], m[1], 0)[2] ? c : m);
+      const left = corners.reduce((m, c) => pr(c[0], c[1], 0)[0] < pr(m[0], m[1], 0)[0] ? c : m);
+      const fu = [front[0] === U[0] ? U[1] : U[0], front[1]], fv = [front[0], front[1] === V[0] ? V[1] : V[0]];
+      line(pr(front[0], front[1], 0), pr(fu[0], fu[1], 0)); line(pr(front[0], front[1], 0), pr(fv[0], fv[1], 0));
+      const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const pm = mid(pr(front[0], front[1], 0), pr(fu[0], fu[1], 0)), pv = mid(pr(front[0], front[1], 0), pr(fv[0], fv[1], 0));
+      lab(pm, 'масса →', pm[0] > cx ? 10 : -10, 22, pm[0] > cx ? 'start' : 'end');
+      lab(pv, 'год →', pv[0] > cx ? 10 : -10, 22, pv[0] > cx ? 'start' : 'end');
+      line(pr(left[0], left[1], 0), pr(left[0], left[1], T[1]));
+      [10, 20, 30, 40].forEach(t => { const q = pr(left[0], left[1], t); line(q, [q[0] - 6, q[1]]); lab(q, String(t), -10, 5, 'end'); });
+      lab(pr(left[0], left[1], T[1]), 'mpg', 0, -10, 'middle');
+      const res = pts.map(p => ({ ...p, f: f(p.x1, p.x2), dp: pr(p.x1, p.x2, p.y)[2] })).sort((p, q) => q.dp - p.dp);
+      const dot = p => {
+        const [x, y] = pr(p.x1, p.x2, p.y), [xf, yf] = pr(p.x1, p.x2, p.f), up = p.y > p.f;
+        g('line', { x1: x, y1: y, x2: xf, y2: yf, stroke: up ? C.green : C.orange, 'stroke-width': 1, 'stroke-opacity': .45 });
+        g('circle', { cx: x, cy: y, r: 3.4, fill: up ? C.green : C.orange, 'fill-opacity': up ? .9 : .55, stroke: '#fff', 'stroke-width': .8 });
+      };
+      res.filter(p => p.y <= p.f).forEach(dot);
+      const c = [[U[0], V[0]], [U[1], V[0]], [U[1], V[1]], [U[0], V[1]]].map(([x1, x2]) => P(x1, x2, f(x1, x2)));
+      g('path', { d: `M${c.join('L')}Z`, fill: 'rgba(38,127,208,.2)', stroke: C.blue, 'stroke-width': 2 });
+      for (let k = 1; k < 4; k++) {
+        const x1 = U[0] + (U[1] - U[0]) * k / 4, x2 = V[0] + (V[1] - V[0]) * k / 4;
+        g('path', { d: `M${P(x1, V[0], f(x1, V[0]))}L${P(x1, V[1], f(x1, V[1]))}`, stroke: C.blue, 'stroke-opacity': .35 });
+        g('path', { d: `M${P(U[0], x2, f(U[0], x2))}L${P(U[1], x2, f(U[1], x2))}`, stroke: C.blue, 'stroke-opacity': .35 });
+      }
+      res.filter(p => p.y > p.f).forEach(dot);
+    }
+    slider(bar, { label: 'Повернуть', min: 0.1, max: 1.45, step: 0.01, value: a, fmt: v => Math.round(v * 180 / Math.PI) + '°', on: v => { a = v; draw(); } });
+    draw();
+    legend(bar, [{ color: C.green, label: 'над плоскостью', dot: 1 }, { color: C.orange, label: 'под ней', dot: 1 }]);
+  };
+
   // ---------- Auto MPG: точки, прямая, остатки, парабола ----------
   function mpgPlot(root, o = {}) {
     const P = plot(root, Object.assign({ w: 1240, h: 430, x: [1.4, 5.4], y: [5, 50], xl: 'Масса, тыс. фунтов', yl: 'Экономичность, миль на галлон (mpg)', xf: v => fmt(v, 1) }, o));
@@ -99,8 +174,8 @@
     const ys = [1, 2, 3, 4, 20], bar = controls(root), ps = panels(root);
     const cs = range(0, 21, 211);
     const mse = c => mean(ys.map(y => (y - c) ** 2)), mae = c => mean(ys.map(y => Math.abs(y - c)));
-    const P1 = plot(ps, { w: 608, h: 330, x: [0, 21], y: [0, 160], title: 'Средний квадрат ошибки', xl: 'константа c' });
-    const P2 = plot(ps, { w: 608, h: 330, x: [0, 21], y: [0, 12], title: 'Средний модуль ошибки', xl: 'константа c' });
+    const PH = +root.dataset.h || 330, P1 = plot(ps, { w: 608, h: PH, x: [0, 21], y: [0, 160], title: 'Средний квадрат ошибки', xl: 'константа c' });
+    const P2 = plot(ps, { w: 608, h: PH, x: [0, 21], y: [0, 12], title: 'Средний модуль ошибки', xl: 'константа c' });
     const n = note(root);
     function draw(c) {
       [[P1, mse, C.blue, 6], [P2, mae, C.green, 3]].forEach(([P, f, col, best]) => {
@@ -134,10 +209,11 @@
       const k = dJ(w), j = J(w), dw = 0.9;
       Q.line([w - dw, w + dw], [j - k * dw, j + k * dw], { stroke: C.orange, 'stroke-width': 2.5 });
       Q.mark(w, j);
-      const dir = Math.abs(k) < 0.3 ? 'почти ноль — мы у минимума' : k < 0 ? 'меньше нуля: J уменьшится, если увеличить w' : 'больше нуля: J уменьшится, если уменьшить w';
-      n.innerHTML = `w = <b>${fmt(w, 1)}</b> · J = <b>${fmt(j, 1)}</b> · производная dJ/dw = <b>${fmt(k, 1)}</b> — ${dir}. Минимум: w = ${fmt(sm.w)}`;
+      const dir = Math.abs(k) < 0.05 ? 'почти ноль: мы у минимума' : k < 0 ? 'меньше нуля: J уменьшится, если увеличить w' : 'больше нуля: J уменьшится, если уменьшить w';
+      n.innerHTML = `w = <b>${fmt(w, 2)}</b> · J = <b>${fmt(j, 2)}</b> · производная dJ/dw = <b>${fmt(k, 2)}</b> — ${dir}. Минимум: w = ${fmt(sm.w)}`;
     }
-    slider(bar, { label: 'Наклон w', min: -11, max: -5, step: 0.1, value: -10, fmt: v => fmt(v, 1), on: draw });
+    const sl = slider(bar, { label: 'Наклон w', min: -11, max: -5, step: 0.01, value: -10, num: true, on: draw });
+    button(bar, 'В минимум', () => { const v = +sm.w.toFixed(2); sl.set(v); draw(v); });
     legend(bar, [{ color: C.orange, label: 'касательная: её наклон — производная' }, { color: C.green, label: 'минимум', dot: 1 }]);
     draw(-10);
   };
@@ -189,7 +265,7 @@
       const cb = controls(box);
       c.segc = seg(cb, 'Шаг η', c.etas.map(v => ({ label: fmt(v, 2), value: v })), c.eta, v => { c.eta = v; draw(); });
       const pw = 608 - 72, ph = 400 - 84;
-      c.P = plot(box, { w: 608, h: 400, x: [o[0] - R, o[0] + R], y: [o[1] - R * ph / pw, o[1] + R * ph / pw], title: c.title, xl: 'вес при массе', yl: 'вес при годе', xf: v => fmt(v, 0), grid: false });
+      c.P = plot(box, { w: 608, h: 400, x: [o[0] - R, o[0] + R], y: [o[1] - R * ph / pw, o[1] + R * ph / pw], title: c.title, xl: 'коэффициент при массе', yl: 'коэффициент при годе', xf: v => fmt(v, 0), grid: false });
       [1, 0.55, 0.25, 0.08, 0.015].forEach(k => {
         const a = Math.sqrt(2 * d0 * k / l1), b = Math.sqrt(2 * d0 * k / l2), ts = range(0, 6.2832, 90);
         c.P.line(ts.map(t => o[0] + a * Math.cos(t) * v1[0] + b * Math.sin(t) * v2[0]), ts.map(t => o[1] + a * Math.cos(t) * v1[1] + b * Math.sin(t) * v2[1]), { stroke: '#cfd6de', 'stroke-width': 1.3, layer: c.P.back });
@@ -278,52 +354,6 @@
       P.line(p.grid, f.curve, { stroke: meta[f.label][1], 'stroke-width': 3.2 });
       h('p', { class: 'scene-note', html: `‖w‖ = <b>${fmt(f.norm, f.norm > 10 ? 0 : 1)}</b> · RMSE validation <b>${fmt(f.val)}</b>` }, cell);
     });
-  };
-
-  // ---------- одномерные Ridge и Lasso ----------
-  S.shrink = root => {
-    const P = plot(root, { w: +root.dataset.w || 560, h: 360, x: [0, 3], y: [0, 2.2], xl: 'сила штрафа λ', yl: 'вес w при a = 1, c = 2', xf: v => fmt(v, 1), yf: v => fmt(v, 1) });
-    const ls = range(0, 3, 121);
-    P.line(ls, ls.map(l => 2 / (1 + l)), { stroke: C.blue, 'stroke-width': 3 });
-    P.line(ls, ls.map(l => Math.max(2 - l, 0)), { stroke: C.orange, 'stroke-width': 3 });
-    P.text(2.5, 2 / 3.5, 'Ridge: вес не ноль', { dy: -14, fill: C.blue, 'font-weight': 600, 'text-anchor': 'middle' });
-    P.text(0.35, 1.65, 'Lasso', { dx: 6, dy: -10, fill: C.orange, 'font-weight': 600 });
-    P.mark(2, 0, { r: 6 }); P.text(2, 0, 'ноль при λ ≥ |c|', { dx: 6, dy: -14, 'text-anchor': 'start', fill: C.orange });
-  };
-
-  // ---------- коррелирующие признаки ----------
-  S.collinear = root => {
-    const c = D.collinear, ps = panels(root, 'p32');
-    let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const sd = a => { const m = mean(a); return Math.sqrt(mean(a.map(v => (v - m) ** 2))); };
-    const rows = [];
-    [['ols', 'МНК без штрафа', C.orange], ['ridge', `Ridge, alpha = ${c.alpha}`, C.blue]].forEach(([k, name, col]) => {
-      const w1 = c[k].map(v => v[0]), w2 = c[k].map(v => v[1]);
-      rows.push({ head: name, col });
-      rows.push({ label: 'вес массы', vals: w1, col });
-      rows.push({ label: 'вес объёма', vals: w2, col });
-      rows.push({ label: 'сумма двух весов', vals: w1.map((v, i) => v + w2[i]), col, bold: true });
-    });
-    const H = 390, P = plot(ps, { w: 760, h: H, x: [-8, 0.6], y: [0, rows.length], yt: [], xl: 'значение веса (признаки стандартизованы), mpg', xn: 8, grid: false, m: { l: 190, r: 96, t: 6 } });
-    P.seg(0, 0, 0, rows.length, { stroke: '#c5ccd4', layer: P.back });
-    rows.forEach((r, i) => {
-      const y = rows.length - i - 0.5;
-      if (r.head) { h('text', { x: 4, y: P.sy(y) + 6, 'font-size': 17, 'font-weight': 600, fill: r.col }, P.svg, r.head); return; }
-      h('text', { x: P.m.l - 12, y: P.sy(y) + 5, 'text-anchor': 'end', 'font-size': 16, fill: C.ink, 'font-weight': r.bold ? 600 : 400 }, P.svg, r.label);
-      const lo = Math.min(...r.vals), hi = Math.max(...r.vals);
-      P.seg(lo, y, hi, y, { stroke: r.col, 'stroke-opacity': .35, 'stroke-width': 8, 'stroke-linecap': 'round', layer: P.back });
-      P.dots(r.vals, r.vals.map(() => y + (rnd() - 0.5) * 0.36), { fill: r.col, r: 3.2, opacity: .85 });
-      h('text', { x: P.m.l + P.pw + 10, y: P.sy(y) + 5, 'font-size': 15, fill: C.muted }, P.svg, `разброс ${fmt(sd(r.vals))}`);
-    });
-    const right = h('div', {}, ps), car = c.car, all = car.ols.concat(car.ridge);
-    const m0 = (Math.min(...all) + Math.max(...all)) / 2;
-    const Q = plot(right, { w: 470, h: 205, x: [m0 - 1.6, m0 + 1.6], y: [0, 2], yt: [], title: 'Прогноз для одной машины validation', xl: 'mpg', xf: v => fmt(v, 1), xn: 4, grid: false, m: { l: 70, r: 12 } });
-    [['ols', 'МНК', C.orange, 1.5], ['ridge', 'Ridge', C.blue, 0.5]].forEach(([k, l, col, y]) => {
-      h('text', { x: 60, y: Q.sy(y) + 5, 'text-anchor': 'end', 'font-size': 16, fill: col, 'font-weight': 600 }, Q.svg, l);
-      Q.dots(car[k], car[k].map(() => y + (rnd() - 0.5) * 0.4), { fill: col, r: 3.5, opacity: .85 });
-    });
-    h('p', { class: 'scene-note', html: `Одна машина validation: разброс прогноза <b>${fmt(sd(car.ols))}</b> mpg у МНК и <b>${fmt(sd(car.ridge))}</b> у Ridge. Вес массы у МНК при этом меняется от ${fmt(Math.min(...c.ols.map(v => v[0])), 1)} до ${fmt(Math.max(...c.ols.map(v => v[0])), 1)}.` }, right);
-    h('p', { class: 'scene-caption', html: 'Каждая точка — одна модель, обученная на бутстреп-выборке train (выбор строк с возвращением). Масштабирование обучено на train.' }, right);
   };
 
   // ---------- веса МНК, Ridge и Lasso ----------

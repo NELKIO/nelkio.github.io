@@ -156,15 +156,14 @@
 <h2>От суммы деревьев к сумме вкладов признаков</h2>
 <p class="lead">Меняем семейство моделей. Схема обучения остаётся знакомой.</p>
 <div class="two">
-  <div class="panel"><p class="eyebrow">Бустинг</p><div class="equation plain" data-tex="\hat y(x)=\hat y^{(0)}+\eta\sum_{m=1}^{M}h_m(x)" data-display=""></div><p>Сумма поправок от деревьев.</p><p class="small">Обучаем: условия в узлах и ответы в листьях.</p></div>
-  <div class="panel"><p class="eyebrow">Линейная модель</p><div class="equation plain" data-tex="\hat y(x)=w_1x_1+w_2x_2+\dots+w_dx_d+b" data-display=""></div><p>Сумма вкладов признаков.</p><p class="small">Обучаем: веса <span data-tex="w_1,\dots,w_d"></span> и свободный член <span data-tex="b"></span>.</p></div>
+  <div class="panel"><p class="eyebrow">Бустинг</p><div class="equation plain" data-tex="\hat y(x)=\hat y^{(0)}+\eta\sum_{m=1}^{M}h_m(x)" data-display=""></div><div class="panel-art"><div><p>Сумма поправок от деревьев.</p><p class="small">Обучаем: условия в узлах и ответы в листьях. Режет плоскость на прямоугольники.</p></div><div class="mini" data-scene="minisplit" data-kind="tree"></div></div></div>
+  <div class="panel"><p class="eyebrow">Линейная модель</p><div class="equation plain" data-tex="\hat y(x)=w_1x_1+w_2x_2+\dots+w_dx_d+b" data-display=""></div><div class="panel-art"><div><p>Сумма вкладов признаков.</p><p class="small">Обучаем: веса (коэффициенты) <span data-tex="w_1,\dots,w_d"></span> и свободный член <span data-tex="b"></span>. Делит плоскость одной прямой.</p></div><div class="mini" data-scene="minisplit" data-kind="line"></div></div></div>
 </div>
 <div class="chain"><div><h3>Данные</h3><p>train, validation, test</p></div><i>→</i><div><h3>Прогноз</h3><p>модель с параметрами</p></div><i>→</i><div><h3>Ошибка</h3><p>функция потерь</p></div><i>→</i><div><h3>Обновление</h3><p>меняем параметры</p></div></div>
 </section>
 
 <section id="four-roles" class="slide level2">
 <h2>Четыре разных решения в одной задаче</h2>
-<p class="lead">Их часто путают. Каждое можно поменять, не трогая остальные.</p>
 <table>
 <tbody>
 <tr><th>Что выбираем</th><th>Вопрос</th><th>Пример сегодня</th></tr>
@@ -174,8 +173,7 @@
 <tr><td><b>Метрика</b></td><td>Как оцениваем на отложенных данных?</td><td>RMSE на validation</td></tr>
 </tbody>
 </table>
-<p class="ask">Заменили при обучении MSE на MAE. Модель осталась линейной?</p>
-<aside class="notes">Ответ: да. Формула прогноза та же, изменился критерий подбора весов. «Линейная регрессия» — про вид модели, а не про MSE.</aside>
+<aside class="notes">«Линейная регрессия» — про вид модели, а не про MSE: если обучать по MAE, модель останется линейной.</aside>
 </section>
 
 <section id="dataset-mpg" class="slide level2">
@@ -263,7 +261,7 @@
 
 <section id="matrix-form" class="slide level2">
 <h2>Вся выборка одной формулой</h2>
-<div class="two">
+<div class="two" style="grid-template-columns:1fr 1.05fr;gap:30px">
 <div>
 <div class="equation center" data-tex="\hat y=Xw+b" data-display=""></div>
 <table class="compact">
@@ -275,18 +273,16 @@
 <tr><td><span data-tex="\hat y"></span></td><td><span data-tex="n"></span></td><td>прогнозы для всех объектов</td></tr>
 </tbody>
 </table>
+<pre class="code-small"><code>w = np.array([-6.41, -1.14, 0.78])
+y_pred = X @ w + b   <span class="c"># X: (233, 3) → (233,)</span></code></pre>
+<p class="small">Оператор <code>@</code> из лекции по NumPy: каждая строка <span data-tex="X"></span> скалярно умножается на <span data-tex="w"></span>.</p>
 </div>
 <div>
-<pre><code>X.shape          <span class="c"># (233, 3)</span>
-w = np.array([-6.41, -1.14, 0.78])
-b = 39.13
-
-y_pred = X @ w + b
-y_pred.shape     <span class="c"># (233,)</span></code></pre>
-<p class="small">Оператор <code>@</code> из лекции по NumPy: каждая строка <span data-tex="X"></span> скалярно умножается на <span data-tex="w"></span>.</p>
-<p class="small">Геометрически: один признак — прямая, два — плоскость, больше — гиперплоскость.</p>
+<p class="small" style="margin:0 0 4px">Один признак — прямая, <b>два — плоскость</b>, больше — гиперплоскость. Масса и год → mpg:</p>
+<div class="scene bare" data-scene="plane" data-w="620" data-h="400"></div>
 </div>
 </div>
+<aside class="notes">Плоскость обучена на train Auto MPG: ŷ = 39,17 − 6,85·масса + 0,80·(год − 1970). Повернуть картинку ползунком: точки над плоскостью — модель занизила, под — завысила. Вертикальные палочки — остатки, следующий слайд как раз про них.</aside>
 </section>
 
 <section id="residuals" class="slide level2">
@@ -309,9 +305,11 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 </section>
 
 <section id="constant" class="slide level2 demo-slide">
-<h2>Сначала проще: какую одну константу предсказать всем?</h2>
-<div class="scene" data-scene="constant"></div>
-<p class="takeaway">Функция потерь определяет ответ: квадраты ошибок выбирают <b>среднее</b>, модули — <b>медиану</b>.<br>Выброс 20 тянет среднее сильнее: его ошибка входит в сумму в квадрате.</p>
+<h2>Откуда берутся веса? Начнём с самой простой модели</h2>
+<p class="lead">До сих пор веса были готовыми. Чтобы их подобрать, нужно решить, что считать ошибкой — выбрать функцию потерь. Посмотрим на модель без признаков: <span data-tex="\hat y=c"></span>, одна константа для всех.</p>
+<div class="scene" data-scene="constant" data-h="290"></div>
+<p class="takeaway">Разные функции потерь — разные лучшие константы: квадраты ошибок (MSE) выбирают <b>среднее</b>, модули (MAE) — <b>медиану</b>. Выброс 20 тянет среднее сильнее.</p>
+<aside class="notes">Мостик: «А теперь — откуда берутся веса». Константа — модель с одним параметром, на ней видно главное: лучший параметр — тот, где минимальна функция потерь. Дальше то же самое для наклона и свободного члена. Для классификации позже будет то же: лучшая константа под log loss — доля класса 1.</aside>
 </section>
 
 <section id="mse" class="slide level2">
@@ -319,11 +317,17 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <p class="lead">Ищем веса, при которых средний квадрат остатка на train минимален.</p>
 <div class="equation accent center" data-tex="J(w,b)=\frac{1}{2n}\sum_{i=1}^{n}\bigl(\underbrace{w\,x_i+b-y_i}_{r_i}\bigr)^2\;\longrightarrow\;\min_{w,\,b}" data-display=""></div>
 <div class="three">
-<div class="panel"><h3>Почему квадрат</h3><p>Знак ошибки не важен. Большие промахи штрафуются сильнее.</p></div>
-<div class="panel"><h3>Зачем 1/2</h3><p>Сократится с двойкой при взятии производной. Положение минимума не меняет.</p></div>
-<div class="panel"><h3>Связь с метриками</h3><p><span data-tex="J=\tfrac12\,\text{MSE}"></span>,&nbsp; <span data-tex="\text{RMSE}=\sqrt{\text{MSE}}"></span>. Минимум у всех трёх — при одних и тех же весах.</p></div>
+<div class="panel compact-panel"><h3>Почему квадрат</h3><p class="small">Знак ошибки не важен. Большие промахи штрафуются сильнее.</p></div>
+<div class="panel compact-panel"><h3>Зачем 1/2</h3><p class="small">Сократится с двойкой при взятии производной. Положение минимума не меняет.</p></div>
+<div class="panel compact-panel"><h3>Связь с метриками</h3><p class="small"><span data-tex="J=\tfrac12\,\text{MSE}"></span>,&nbsp; <span data-tex="\text{RMSE}=\sqrt{\text{MSE}}"></span>. Минимум у всех трёх — при одних и тех же весах.</p></div>
 </div>
-<p class="small"><span data-tex="J"></span> — парабола по <span data-tex="w"></span> и по <span data-tex="b"></span>. Её минимум найдём так же, как на лекции про оптимизацию: через производную.</p>
+<div class="two" style="grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;margin-top:18px">
+<pre class="code-small" style="margin:0"><code>from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit(X_train, y_train)
+model.coef_, model.intercept_   <span class="c"># [-7.94], 47.32</span>
+model.predict(X_val)</code></pre>
+<p class="small" style="margin:0">В sklearn МНК готов: <code>LinearRegression</code> сам подбирает веса, при которых прямая ближе всего к точкам. Дальше — как он это делает.</p>
+</div>
 </section>
 
 <section id="min-derivative" class="slide level2 demo-slide">
@@ -354,7 +358,7 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <section id="gd-demo" class="slide level2 demo-slide">
 <h2>Масштаб признаков меняет путь градиентного спуска</h2>
 <div class="scene" data-scene="gd"></div>
-<p class="scene-caption">Auto MPG, train: предсказываем mpg по массе и году модели, признаки и ответ центрированы. Вертикальная ось — вес при годе модели. Масштабы осей на каждом графике равны.</p>
+<p class="scene-caption">Auto MPG, train: предсказываем mpg по массе и году модели, признаки и ответ центрированы. По осям — коэффициенты (веса) при массе и при годе. Масштабы осей на каждом графике равны.</p>
 <aside class="notes">Слева долина вытянута: год меняется в диапазоне 12 лет, масса — в пределах 3,5 тыс. фунтов. При η = 0,15 спуск колеблется поперёк долины и ползёт вдоль. При η = 0,17 расходится. Справа после стандартизации линии уровня почти круглые, η = 1 сходится за несколько шагов. Минимум J один и тот же — стандартизация не меняет лучшие прогнозы МНК, она меняет удобство оптимизации.</aside>
 </section>
 
@@ -447,13 +451,36 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 
 <section id="regularization-intro" class="slide level2">
 <h2>Регуляризация: штраф за большие веса</h2>
-<div class="two" style="grid-template-columns:1fr 1.3fr;align-items:center;gap:30px">
-<div class="equation accent center" data-tex="J(w,b)+\frac{\lambda}{2}\sum_{j}w_j^2" data-display=""></div>
-<p style="margin:0">Меняем не данные, а <b>функцию потерь</b>: большие веса теперь стоят дорого. Пример — полином степени 12 из опыта со степенями.</p>
+<div class="two" style="grid-template-columns:1fr 1.25fr;align-items:center;gap:28px">
+<div>
+<div class="equation accent center" data-tex="J(w,b)+\lambda\sum_{j}w_j^2" data-display="" style="margin:0 0 8px"></div>
+<p class="small" style="margin:0">Меняем не данные, а <b>функцию потерь</b>: большие веса теперь стоят дорого.</p>
 </div>
-<div class="scene bare" data-scene="ridgepoly" style="margin-top:16px"></div>
-<p class="scene-caption">Чёрные точки — train, пунктир — зависимость без шума. Степени x, …, x¹² стандартизованы по train; подобранный alpha — лучший по validation из 15 значений от 0,0001 до 1000.</p>
-<p class="takeaway">Нужна середина между «цепляется за шум» и «всё выпрямил» — её ищем по validation.</p>
+<pre class="code-small" style="margin:0"><code>model = LinearRegression()            <span class="c"># было</span>
+model = make_pipeline(StandardScaler(),
+                      Ridge(alpha=1.0))  <span class="c"># стало</span>
+model.fit(X_train, y_train)</code></pre>
+</div>
+<div class="scene bare" data-scene="ridgepoly" style="margin-top:14px"></div>
+<p class="scene-caption">Полином степени 12 из опыта со степенями. Чёрные точки — train, пунктир — зависимость без шума. Степени x, …, x¹² стандартизованы по train; подобранный alpha — лучший по validation из 15 значений от 0,0001 до 1000.</p>
+<aside class="notes">Без штрафа — цепляется за шум, слишком сильный штраф — всё выпрямил. Середину ищем по validation. В коде меняется одна строка: класс модели и alpha, всё остальное как у LinearRegression.</aside>
+</section>
+
+<section id="three-models" class="slide level2">
+<h2>LinearRegression, Ridge, Lasso: одна модель, разные штрафы</h2>
+<p class="lead">У всех трёх прогноз один и тот же — <span data-tex="\hat y=w\cdot x+b"></span>, и тот же код: <code>fit</code>, <code>predict</code>, <code>coef_</code>. Отличается только то, что минимизируем.</p>
+<div class="vs">
+<div class="panel"><p class="eyebrow">Без штрафа</p><h3><code>LinearRegression()</code></h3><div class="equation plain" data-tex="\text{MSE}" data-display=""></div><p>Веса — какие получились.</p><p class="small">Признаков мало, объектов много, признаки не дублируют друг друга.</p></div>
+<div class="panel"><p class="eyebrow">L2-штраф</p><h3><code>Ridge(alpha=…)</code></h3><div class="equation plain" data-tex="\text{MSE}+\lambda\sum_j w_j^2" data-display=""></div><p>Все веса меньше, но не ноль. Похожие признаки делят вклад.</p><p class="small">Выбор по умолчанию.</p></div>
+<div class="panel"><p class="eyebrow">L1-штраф</p><h3><code>Lasso(alpha=…)</code></h3><div class="equation plain" data-tex="\text{MSE}+\lambda\sum_j |w_j|" data-display=""></div><p>Часть весов — ровно ноль: признак выпадает.</p><p class="small">Признаков много, полезны немногие.</p></div>
+</div>
+<div class="two" style="grid-template-columns:1.1fr 1fr;gap:28px;align-items:center;margin-top:16px">
+<pre class="code-small" style="margin:0"><code>LinearRegression().fit(X_train, y_train)
+Ridge(alpha=10).fit(X_train, y_train)
+Lasso(alpha=0.7).fit(X_train, y_train)</code></pre>
+<p class="small" style="margin:0">Сила штрафа <span data-tex="\lambda"></span> в sklearn — <code>alpha</code>. При <code>alpha = 0</code> Ridge и Lasso совпадают с МНК, при большом — все веса около нуля. Свободный член <span data-tex="b"></span> не штрафуется. Признаки перед штрафом стандартизуем.</p>
+</div>
+<aside class="notes">Формулы схематичные: точные коэффициенты перед суммами у классов sklearn разные (см. слайд про выбор alpha). Почему у Lasso нули: для одного признака вес = sign(c)·max(|c| − λ, 0)/a — если связь признака с ответом слабее штрафа, вес ровно ноль. У Ridge вес = c/(a + λ): уменьшается, но нулём не становится.</aside>
 </section>
 
 <section id="when-scale" class="slide level2">
@@ -479,40 +506,48 @@ model.predict(X_val)</code></pre>
 </div>
 </section>
 
-<section id="collinear" class="slide level2 demo-slide">
-<h2>Похожие признаки: веса нестабильны, прогноз — нет</h2>
-<p class="lead">Масса и объём двигателя почти дублируют друг друга (корреляция 0,92). Обучим модель на них 40 раз на случайных подвыборках train.</p>
-<div class="scene" data-scene="collinear"></div>
-<p class="takeaway">Данные хорошо определяют <b>сумму</b> весов похожих признаков, но не то, как её поделить. Поэтому по отдельному весу нельзя судить о важности признака.</p>
-<aside class="notes">Каждая точка — одна обученная модель. У МНК вес массы гуляет от −6,7 до −2,8, а сумма весов массы и объёма почти постоянна. Прогноз для конкретной машины меняется меньше чем на ±0,5 mpg. Ridge делит вклад ровнее, его веса стабильнее; прогноз такой же стабильный. Связь с бустингом: перестановочная важность коррелирующих температур.</aside>
-</section>
-
-<section id="regularization" class="slide level2">
-<h2>Регуляризация: добавим цену за большие веса</h2>
-<div class="two">
-<div class="panel"><p class="eyebrow">L2-штраф</p><h3>Ridge</h3><div class="equation plain" data-tex="J(w,b)+\frac{\lambda}{2}\sum_{j=1}^{d}w_j^2" data-display=""></div><p>Плавно уменьшает все веса. Похожие признаки делят вклад между собой.</p></div>
-<div class="panel"><p class="eyebrow">L1-штраф</p><h3>Lasso</h3><div class="equation plain" data-tex="J(w,b)+\lambda\sum_{j=1}^{d}|w_j|" data-display=""></div><p>Часть весов делает точно нулевыми — признаки выпадают из модели.</p></div>
-</div>
-<div class="steps">
-<div class="step"><b>λ</b><p>Сила штрафа, <span data-tex="\lambda\ge 0"></span>. При <span data-tex="\lambda=0"></span> получаем обычный МНК. Слишком большая <span data-tex="\lambda"></span> — все веса около нуля, модель недообучена.</p></div>
-<div class="step"><b>b</b><p>Свободный член не штрафуем: сдвиг всех прогнозов не делает модель сложнее.</p></div>
-</div>
-<p class="small">Та же идея, что ограничение глубины и шага в бустинге: проигрываем немного на train, чтобы выиграть на новых данных.</p>
-</section>
-
-<section id="shrink-1d" class="slide level2">
-<h2>Как штраф действует на один вес</h2>
-<p>Один центрированный признак. Обозначим <span data-tex="a=\tfrac1n\sum x_i^2"></span> и <span data-tex="c=\tfrac1n\sum x_iy_i"></span>. Тогда МНК даёт <span data-tex="w=c/a"></span>.</p>
-<div class="two wide-left">
+<section id="collinear" class="slide level2">
+<h2>Похожие признаки: МНК не знает, как поделить вклад</h2>
+<div class="two" style="grid-template-columns:1fr 1.3fr;gap:30px">
 <div>
-<div class="equation" data-tex="\textcolor{#267fd0}{\text{Ridge:}}\quad (a+\lambda)\,w-c=0\;\Longrightarrow\; w=\frac{c}{a+\lambda}" data-display=""></div>
-<p class="small">Знаменатель растёт — вес сжимается, но нулём не становится.</p>
-<div class="equation" data-tex="\textcolor{#d5673d}{\text{Lasso:}}\quad w=\operatorname{sign}(c)\cdot\frac{\max(|c|-\lambda,\;0)}{a}" data-display=""></div>
-<p class="small">Из <span data-tex="|c|"></span> вычитается <span data-tex="\lambda"></span>. Если связь признака с ответом слабее штрафа, вес — точный ноль.</p>
+<p>Пусть <span data-tex="x_2"></span> — точная копия <span data-tex="x_1"></span>. Все эти модели дают <b>одинаковые</b> прогнозы:</p>
+<div class="equation math-small" data-tex="\hat y=2x_1+0x_2=x_1+x_2=102x_1-100x_2" data-display=""></div>
+<p>Данные задают только сумму <span data-tex="w_1+w_2=2"></span>. Как её поделить — модели всё равно, поэтому веса случайны и могут стать огромными.</p>
 </div>
-<div class="scene bare" data-scene="shrink" data-w="520"></div>
+<div>
+<p>Auto MPG: масса и объём двигателя, корреляция 0,92. Обучили МНК и Ridge 40 раз на случайных подвыборках train:</p>
+<table class="compact num" style="white-space:nowrap">
+<tbody>
+<tr><th></th><th>Вес массы</th><th>Вес объёма</th><th>Прогноз, mpg</th></tr>
+<tr><td style="text-align:left">МНК</td><td>−6,67 … −2,77</td><td>−3,90 … +0,13</td><td>20,3 … 21,2</td></tr>
+<tr><td style="text-align:left">Ridge</td><td>−4,06 … −2,90</td><td>−3,44 … −2,07</td><td>20,5 … 21,7</td></tr>
+</tbody>
+</table>
+<p class="small">От меньшего до большего значения за 40 обучений. Признаки стандартизованы, Ridge с alpha = 30, прогноз — для одной машины validation. Прогноз стабилен у обеих моделей, веса — только у Ridge.</p>
 </div>
-<p class="small">Для нескольких коррелирующих признаков эти формулы по отдельности не применяются — там веса влияют друг на друга.</p>
+</div>
+<p class="takeaway">Есть похожие признаки — по отдельному весу о важности не судим. Помогает Ridge (делит вклад поровну), Lasso (оставит один из группы) или удаление дубля.</p>
+<aside class="notes">Если спросят, почему так: МНК решает систему уравнений «все производные равны нулю». При x₂ = x₁ два уравнения этой системы одинаковые — как x + y = 2 и 2x + 2y = 4: решений бесконечно много. Когда признаки почти совпадают, решение формально одно, но малейший шум в данных сильно его сдвигает. Ridge добавляет к системе штраф, и решение становится единственным и устойчивым. Связь с бустингом: перестановочная важность коррелирующих признаков тоже делится между ними.</aside>
+</section>
+
+<section id="when-penalty" class="slide level2">
+<h2>Когда включать штраф: сигналы</h2>
+<table>
+<tbody>
+<tr><th>Сигнал</th><th>Как заметить</th></tr>
+<tr><td>Модель переобучилась</td><td>ошибка на train намного меньше, чем на validation</td></tr>
+<tr><td>Признаков много относительно объектов</td><td><code>X_train.shape</code>: сотни столбцов на тысячу строк; полиномы, one-hot</td></tr>
+<tr><td>Есть похожие признаки</td><td><code>X_train.corr()</code>: пары с корреляцией около ±1</td></tr>
+<tr><td>Веса огромные или скачут</td><td><code>model.coef_</code> меняется от небольшого изменения train</td></tr>
+</tbody>
+</table>
+<div class="two" style="margin-top:6px">
+<pre class="code-small"><code>for alpha in [0.01, 0.1, 1, 10, 100]:
+    m = make_pipeline(StandardScaler(), Ridge(alpha=alpha))
+    m.fit(X_train, y_train)
+    print(alpha, mean_squared_error(y_val, m.predict(X_val)) ** 0.5)</code></pre>
+<p class="small">Нет ни одного сигнала — штраф почти ничего не изменит, можно без него. Решаем не на глаз: сравниваем с <code>LinearRegression</code> на validation.</p>
+</div>
 </section>
 
 <section id="paths" class="slide level2">
@@ -554,8 +589,7 @@ model.predict(X_val)</code></pre>
 <tr><td><code>LogisticRegression</code></td><td><code>C</code></td><td class="no">слабее штраф</td></tr>
 </tbody>
 </table>
-<p class="small">В наших обозначениях: у <code>Lasso</code> <span data-tex="\text{alpha}=\lambda"></span>, у <code>Ridge</code> <span data-tex="\text{alpha}=n\lambda"></span>, у логрега <span data-tex="C=1/(n\lambda)"></span>. Библиотеки по-разному нормируют сумму ошибок, поэтому числа между классами не переносятся.</p>
-<p class="small">Результат одного разбиения — не рейтинг методов. На другой выборке порядок может быть иным.</p>
+<p class="small">Классы по-разному нормируют ошибку, поэтому подходящий alpha у Ridge и у Lasso разный — подбираем для каждого.</p>
 </div>
 </div>
 </section>
@@ -627,13 +661,12 @@ model.predict(X_val)</code></pre>
 <div class="two">
 <div>
 <p>Выразим <span data-tex="p"></span> из равенства <span data-tex="\ln\frac{p}{1-p}=z"></span>:</p>
-<div class="equation accent center" data-tex="p=\sigma(z)=\frac{1}{1+e^{-z}}" data-display=""></div>
+<div class="equation math-small" data-tex="\begin{aligned}\frac{p}{1-p}&amp;=e^{z}\\ p&amp;=e^{z}-p\,e^{z}\\ p\,(1+e^{z})&amp;=e^{z}\end{aligned}" data-display=""></div>
+<div class="equation accent center" data-tex="p=\frac{e^{z}}{1+e^{z}}=\frac{1}{1+e^{-z}}=\sigma(z)" data-display=""></div>
 <table class="compact num">
 <tbody>
-<tr><th>score z</th><th>шансы</th><th>p</th></tr>
-<tr><td>−2</td><td>0,14</td><td>0,12</td></tr>
-<tr><td>0</td><td>1</td><td>0,50</td></tr>
-<tr><td>+2</td><td>7,39</td><td>0,88</td></tr>
+<tr><th>score z</th><th>−2</th><th>0</th><th>+2</th></tr>
+<tr><td>p</td><td>0,12</td><td>0,50</td><td>0,88</td></tr>
 </tbody>
 </table>
 <p class="small">Признак вырос на 1 → score вырос на <span data-tex="w_j"></span> → шансы умножились на <span data-tex="e^{w_j}"></span>. Вероятность при этом меняется не на постоянную величину.</p>
@@ -880,10 +913,23 @@ b -= eta * (p - y).mean()</code></pre>
 <h2>Зачем линейные модели, если есть бустинг</h2>
 <div class="three">
 <div class="panel"><h3>Быстрый ориентир</h3><p>Обучается за секунды, почти без настроек. Сразу видно, насколько задача вообще решаема.</p><p class="small">Если сложная модель не обгоняет простую — повод проверить признаки, данные и схему проверки.</p></div>
-<div class="panel"><h3>Много разреженных признаков</h3><p>Тексты как «мешок слов», one-hot с тысячами категорий. Здесь линейные модели часто на уровне сложных.</p><p class="small">Плюс L1-штраф сам отберёт признаки.</p></div>
+<div class="panel"><h3>Разреженные признаки</h3><p>Тексты, one-hot с тысячами категорий. Здесь линейные модели часто не хуже бустинга и намного быстрее.</p><p class="small">Подробнее — на следующем слайде.</p></div>
 <div class="panel"><h3>Тренд и мало данных</h3><p>Когда зависимость близка к прямой, а объектов немного, две-три величины оценить проще, чем сотни листьев.</p><p class="small">И прогноз продолжается за пределы train — если тренду можно верить.</p></div>
 </div>
 <p class="takeaway">Кроме того, линейный score внутри: у каждого нейрона нейросети, в стекинге поверх других моделей, в самой логистической регрессии.</p>
+</section>
+
+<section id="sparse" class="slide level2">
+<h2>Разреженные данные — сильная сторона линейных моделей</h2>
+<p class="lead">Тысячи столбцов, почти все значения — нули. Письмо как «мешок слов»: 20 000 столбцов «сколько раз встретилось слово», ненулевых в строке — около сотни.</p>
+<div class="two">
+<div class="panel"><p class="eyebrow">Линейная модель</p><h3>Хорошо</h3><p>Score — сумма вкладов <b>только ненулевых</b> признаков: быстро даже на миллионах столбцов.</p><p>Каждое слово добавляет свой маленький вклад, и все вклады складываются.</p><p class="small"><code>LogisticRegression</code> и <code>Ridge</code> принимают разреженную матрицу как есть.</p></div>
+<div class="panel"><p class="eyebrow">Бустинг на деревьях</p><h3>Часто хуже</h3><p>Каждый узел смотрит на один столбец, а большинство слов встречается в единицах писем — на них трудно найти хороший порог.</p><p>Чтобы сложить свидетельства от сотни слов, нужны сотни узлов: обучается долго и легко переобучается.</p></div>
+</div>
+<pre class="code-small"><code>vec = CountVectorizer()
+X_train = vec.fit_transform(texts_train)   <span class="c"># разреженная матрица</span>
+model = LogisticRegression(C=1.0).fit(X_train, y_train)</code></pre>
+<aside class="notes">Это практическое наблюдение, а не теорема: на текстах и огромных one-hot линейная модель часто не хуже бустинга и в десятки раз быстрее. Масштабировать такие признаки через StandardScaler нельзя без with_mean=False: вычитание среднего превратит нули в не-нули и матрица перестанет быть разреженной.</aside>
 </section>
 
 <section id="quiz-7" class="slide level2 quiz-slide">
