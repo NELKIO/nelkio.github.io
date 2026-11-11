@@ -314,13 +314,6 @@ y_pred.shape     <span class="c"># (233,)</span></code></pre>
 <p class="takeaway">Функция потерь определяет ответ: квадраты ошибок выбирают <b>среднее</b>, модули — <b>медиану</b>.<br>Выброс 20 тянет среднее сильнее: его ошибка входит в сумму в квадрате.</p>
 </section>
 
-<section id="handfit" class="slide level2 demo-slide">
-<h2>Подберём прямую руками</h2>
-<div class="scene" data-scene="handfit"></div>
-<p class="ask">Как найти лучшие w и b без перебора ползунками?</p>
-<aside class="notes">Пусть кто-нибудь из зала командует ползунками. Затем показать решение МНК и перейти к формуле: минимум RMSE и минимум MSE достигаются при одних и тех же w и b.</aside>
-</section>
-
 <section id="mse" class="slide level2">
 <h2>Метод наименьших квадратов</h2>
 <p class="lead">Ищем веса, при которых средний квадрат остатка на train минимален.</p>
@@ -508,14 +501,29 @@ for step in range(n_steps):
 </section>
 
 <section id="three-words" class="slide level2">
-<h2>Три слова на «-ция»</h2>
-<p class="lead">Первые два преобразуют данные. Третье меняет функцию потерь.</p>
-<div class="three">
-<div class="panel"><p class="eyebrow">Данные</p><h3>Нормализация</h3><div class="equation plain math-small" data-tex="x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}" data-display=""></div><p>Значения попадают в отрезок от 0 до 1.</p><p class="small"><code>MinMaxScaler</code>. Чувствительна к выбросам.</p></div>
-<div class="panel"><p class="eyebrow">Данные</p><h3>Стандартизация</h3><div class="equation plain math-small" data-tex="x'=\frac{x-\bar x}{s_x}" data-display=""></div><p>Среднее 0, стандартное отклонение 1.</p><p class="small"><code>StandardScaler</code>. Основной выбор для линейных моделей.</p></div>
-<div class="panel"><p class="eyebrow">Функция потерь</p><h3>Регуляризация</h3><div class="equation plain math-small" data-tex="J+\text{штраф за большие веса}" data-display=""></div><p>Ограничивает сложность модели.</p><p class="small"><code>Ridge</code>, <code>Lasso</code>, параметр <code>C</code> в логреге.</p></div>
+<h2>Три слова на «-ция»: нормализация и стандартизация</h2>
+<p class="lead">Первые два слова меняют масштаб данных. Сами объекты и их порядок остаются прежними.</p>
+<div class="two" style="gap:24px">
+<div class="panel compact-panel"><h3>Нормализация · <code>MinMaxScaler</code></h3><div class="equation plain math-small" data-tex="x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}\in[0;\,1]" data-display=""></div><p class="small">Один выброс сожмёт остальные значения к краю.</p></div>
+<div class="panel compact-panel"><h3>Стандартизация · <code>StandardScaler</code></h3><div class="equation plain math-small" data-tex="x'=\frac{x-\bar x}{s_x}:\quad\text{среднее }0,\ \text{разброс }1" data-display=""></div><p class="small">Основной выбор для линейных моделей.</p></div>
 </div>
-<p class="small">Dodge Aspen, 3,36 тыс. фунтов. Нормализация: (3,36 − 1,61) / (5,14 − 1,61) = 0,50. Стандартизация: (3,36 − 3,02) / 0,83 = 0,41 — «на 0,41 стандартного отклонения тяжелее средней машины train».</p>
+<div class="scene bare" data-scene="scaling" style="margin-top:14px"></div>
+<p class="scene-caption">Auto MPG, 233 машины train с известной мощностью. На общей оси в исходных единицах мощность и разгон почти не видны: их числа в десятки раз меньше массы. Dodge Aspen, 3360 фунтов: нормализация (3,36 − 1,61) / (5,14 − 1,61) = 0,50, стандартизация (3,36 − 3,02) / 0,83 = 0,41.</p>
+</section>
+
+<section id="regularization-intro" class="slide level2">
+<h2>Третье слово — регуляризация: штраф за большие веса</h2>
+<div class="two wide-right" style="grid-template-columns:1fr 1.45fr">
+<div>
+<p>Меняет не данные, а <b>функцию потерь</b>:</p>
+<div class="equation math-small" data-tex="J(w,b)+\frac{\lambda}{2}\sum_{j}w_j^2" data-display=""></div>
+<p>Полином степени 12 из опыта со степенями: без штрафа веса огромные, кривая цепляется за шум.</p>
+<p>Небольшой штраф успокаивает кривую, слишком большой — недообучение.</p>
+<p class="small">Степени <span data-tex="x,\dots,x^{12}"></span> стандартизованы по train; alpha выбран по validation из 15 значений от 0,0001 до 1000.</p>
+</div>
+<div class="scene bare" data-scene="ridgepoly" data-w="700"></div>
+</div>
+<p class="takeaway">Как устроены Ridge и Lasso и как выбрать силу штрафа — через несколько слайдов.</p>
 </section>
 
 <section id="when-scale" class="slide level2">

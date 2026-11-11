@@ -211,6 +211,38 @@
     caption(root, 'Учебная синтетика: y = 1 + 2x − 3x² + шум N(0; 0,4²), x ∼ U(−1; 1), генератор NumPy с seed = 0. Модель обучается только на train.');
   };
 
+  // ---------- масштабы признаков ----------
+  S.scaling = root => {
+    const d = D.scaling, cols = [C.blue, C.orange, C.green];
+    const box = h('div', { class: 'scene-panels', style: 'grid-template-columns:1.35fr 1fr 1fr;gap:18px' }, root);
+    let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const jit = d.raw[0].map(() => (rnd() - 0.5) * 0.5);
+    [['raw', 'Исходные единицы', [0, 5500], v => v === 0 ? '0' : fmt(v / 1000, 0) + ' тыс.'],
+     ['minmax', 'Нормализация', [-0.1, 1.1], v => fmt(v, 1)],
+     ['std', 'Стандартизация', [-3, 4], v => fmt(v, 0)]].forEach(([k, title, xr, xf], pi) => {
+      const P = plot(box, { w: pi ? 330 : 446, h: 250, x: xr, y: [-0.6, 2.6], title, xf, xn: pi === 2 ? 7 : 5, yt: [], grid: false, m: { l: pi ? 10 : 126, r: 10, b: 30 } });
+      if (k === 'std') P.seg(0, -0.6, 0, 2.6, { stroke: '#c5ccd4', 'stroke-dasharray': '4 4', layer: P.back });
+      if (k === 'minmax') [0, 1].forEach(v => P.seg(v, -0.6, v, 2.6, { stroke: '#c5ccd4', 'stroke-dasharray': '4 4', layer: P.back }));
+      d[k].forEach((col, j) => {
+        const row = 2 - j;
+        P.dots(col, col.map((_, i) => row + jit[i]), { fill: cols[j], r: 3, opacity: .55 });
+        if (!pi) h('text', { x: P.m.l - 10, y: P.sy(row) + 5, 'text-anchor': 'end', 'font-size': 15, fill: C.ink }, P.svg, d.names[j]);
+      });
+    });
+  };
+
+  // ---------- регуляризация полинома степени 12 ----------
+  S.ridgepoly = root => {
+    const p = D.poly, rp = D.ridge_poly;
+    const P = plot(root, { w: +root.dataset.w || 640, h: 370, x: [-1.12, 1.12], y: [-5.6, 2.8], xl: 'x', xf: v => fmt(v, 1) });
+    P.line(p.grid, p.truth, { stroke: C.gray, 'stroke-dasharray': '6 5', 'stroke-width': 1.6, layer: P.back });
+    P.dots(p.val[0], p.val[1], { fill: '#fff', stroke: C.gray, opacity: 1, r: 4, layer: P.back });
+    P.dots(p.train[0], p.train[1], { fill: C.ink, opacity: .8, r: 4, layer: P.back });
+    const style = { none: [C.orange, 'без штрафа'], best: [C.blue, `Ridge, alpha = ${fmt(rp.fits[1].alpha, 2)}`], strong: [C.violet, 'Ridge, alpha = 100'] };
+    rp.fits.forEach(f => P.line(p.grid, f.curve, { stroke: style[f.label][0], 'stroke-width': 3 }));
+    legend(root, rp.fits.map(f => ({ color: style[f.label][0], label: `${style[f.label][1]} · ‖w‖ = ${fmt(f.norm, f.norm > 10 ? 0 : 1)} · RMSE val ${fmt(f.val)}` })).concat([{ color: C.ink, label: 'train', dot: 1 }, { color: C.gray, label: 'validation (полые)', dot: 1 }]));
+  };
+
   // ---------- одномерные Ridge и Lasso ----------
   S.shrink = root => {
     const P = plot(root, { w: +root.dataset.w || 560, h: 360, x: [0, 3], y: [0, 2.2], xl: 'сила штрафа λ', yl: 'вес w при a = 1, c = 2', xf: v => fmt(v, 1), yf: v => fmt(v, 1) });

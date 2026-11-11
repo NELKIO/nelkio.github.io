@@ -187,3 +187,8 @@ html.print-pdf .quiz .quiz-options button.right::before{background:var(--green);
 .reveal .section-break ol.parts li span{display:block;font-size:15px;font-weight:600;letter-spacing:.08em;margin-bottom:4px}
 .reveal .section-break ol.parts li.on{border-top-color:var(--blue);color:var(--ink);font-weight:500}
 .reveal .section-break ol.parts li.on span{color:var(--blue)}
+
+.reveal .compact-panel{padding:14px 20px}
+.reveal .compact-panel h3{font-size:21px;margin-bottom:2px}
+.reveal .compact-panel .equation{margin:4px 0;font-size:24px}
+.reveal .compact-panel .small{font-size:18px;margin:2px 0 0}
