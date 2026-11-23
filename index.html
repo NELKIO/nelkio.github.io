@@ -13,7 +13,7 @@
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:site_name" content="NELKIO" />
     <meta property="og:title" content="Лука Дуванов (NELKIO) — ML, анализ данных и проекты" />
-    <meta property="og:description" content="Студент ПМИ ФКН ВШЭ. Призёр ВСОШ по ИИ, трижды диплом DANO, победитель 4 хакатонов DANO. Проекты и эксперименты." />
+    <meta property="og:description" content="Студент ПМИ ФКН ВШЭ. Призёр ВСОШ по ИИ, трижды диплом DANO, победитель 4 хакатонов DANO. Проекты." />
     <meta property="og:url" content="https://nelkio.github.io/" />
     <meta property="og:image" content="https://nelkio.github.io/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -49,7 +49,12 @@
             "Победитель олимпиады DLS, 2026"
           ]
         },
-        "hasPart": [{ "@type": "VideoGame", "name": "Influence Web", "url": "https://nelkio.github.io/influence-web/" }]
+        "hasPart": [
+          { "@type": "VideoGame", "name": "Influence Web", "url": "https://nelkio.github.io/influence-web/" },
+          { "@type": "VideoGame", "name": "Фудрадар", "url": "https://nelkio.github.io/RU-Fast-Food-Locator-Game/" },
+          { "@type": "VideoGame", "name": "Hexlume", "url": "https://nelkio.github.io/hexceed-web/" },
+          { "@type": "WebApplication", "name": "WinPaint", "url": "https://nelkio.github.io/WinPaint/", "applicationCategory": "MultimediaApplication" }
+        ]
       }
     </script>
     <script>
@@ -122,9 +127,19 @@
         gap: 16px;
       }
 
-      @media (min-width: 760px) {
+      @media (min-width: 600px) {
         .grid {
           grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (min-width: 900px) {
+        .grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid .title {
+          font-size: 18px;
         }
       }
 
@@ -222,6 +237,56 @@
       .go svg {
         width: 22px;
         height: 22px;
+      }
+
+      /* Cards with a separate GitHub button: the whole card links to the game, the button to its repo */
+      .card .hit {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: inherit;
+      }
+
+      .card .hit:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
+      }
+
+      .repo {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px 6px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(11, 12, 15, 0.72);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .repo svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      .repo:hover {
+        background: rgba(11, 12, 15, 0.92);
+        border-color: rgba(255, 255, 255, 0.35);
+      }
+
+      .repo:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
       }
 
       /* About: intro, stats and a timeline with the line down the middle */
@@ -745,7 +810,7 @@
     <main>
       <header>
         <h1>NELKIO</h1>
-        <p>Проекты и эксперименты</p>
+        <p>Проекты</p>
       </header>
       <div class="grid" id="grid"></div>
 
@@ -885,7 +950,37 @@
           title: 'Influence Web',
           desc: '«Влияние» в браузере: стратегия о захвате территории. Боты, дуэли, карта дня.',
           url: 'https://nelkio.github.io/influence-web/',
+          repo: 'https://github.com/NELKIO/influence-web',
           cover: 'https://nelkio.github.io/influence-web/og.png',
+        },
+        {
+          title: 'Фудрадар',
+          desc: 'Масштабная ККИ в реальном городе: заходи в фастфуды, собирай колоду из бродячих бойцов и бросай вызов сильнейшим тренерам.',
+          url: 'https://nelkio.github.io/RU-Fast-Food-Locator-Game/',
+          repo: 'https://github.com/NELKIO/RU-Fast-Food-Locator-Game',
+          cover: 'covers/fudradar.jpg',
+          pos: 'center top', // phones bleed off the bottom edge, so wide cards crop from below
+        },
+        {
+          title: 'Hexlume',
+          desc: 'Как сапёр, только на шестиугольниках: зажги все огоньки чистой логикой, без угадывания.',
+          url: 'https://nelkio.github.io/hexceed-web/',
+          repo: 'https://github.com/NELKIO/hexceed-web',
+          cover: 'https://nelkio.github.io/hexceed-web/og.jpg',
+        },
+        {
+          title: 'Библиотека материалов',
+          desc: 'Мои учебные презентации',
+          url: 'https://github.com/NELKIO/presentations',
+          cover: 'covers/materials.svg',
+        },
+        {
+          title: 'WinPaint',
+          desc: 'Тот самый Paint из Windows 10: прямо в браузере или приложением для Linux и macOS.',
+          url: 'https://nelkio.github.io/WinPaint/',
+          repo: 'https://github.com/NELKIO/WinPaint',
+          cover: 'covers/winpaint.jpg',
+          pos: 'center top', // keep the ribbon in view
         },
       ];
       const GITHUB = { title: 'GitHub', desc: 'Код и все проекты', url: 'https://github.com/NELKIO' };
@@ -917,11 +1012,15 @@
         '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
 
       const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-      const card = (p, alt, cover) =>
-        `<a class="card${alt ? ' alt' : ''}" href="${esc(p.url)}">${cover}<div class="body"><div><div class="title">${esc(p.title)}</div><div class="desc">${esc(p.desc)}</div></div><span class="go">${arrow}</span></div></a>`;
+      const card = (p, alt, cover) => {
+        const inner = `${cover}<div class="body"><div><div class="title">${esc(p.title)}</div><div class="desc">${esc(p.desc)}</div></div><span class="go">${arrow}</span></div>`;
+        if (!p.repo) return `<a class="card${alt ? ' alt' : ''}" href="${esc(p.url)}">${inner}</a>`;
+        // Links can't nest: the whole card is covered by one link (.hit), the small GitHub button sits above it.
+        return `<div class="card">${inner}<a class="hit" href="${esc(p.url)}" aria-label="${esc(p.title)}"></a><a class="repo" href="${esc(p.repo)}" aria-label="${esc(p.title)}: код на GitHub">${githubMark}GitHub</a></div>`;
+      };
 
       document.getElementById('grid').innerHTML =
-        PROJECTS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}')"></div>`)).join('') +
+        PROJECTS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}');background-position:${p.pos || 'center'}"></div>`)).join('') +
         card(GITHUB, true, `<div class="cover github">${githubMark}</div>`) +
         DECKS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}');background-position:${p.pos};background-size:${p.fit || 'cover'};background-repeat:no-repeat;background-color:${p.bg || 'transparent'}"></div>`)).join('');
 
@@ -963,7 +1062,16 @@
       update();
     </script>
     <noscript>
-      <p style="padding: 0 20px"><a href="https://nelkio.github.io/influence-web/">Influence Web</a> · <a href="https://github.com/NELKIO">GitHub</a> · <a href="dano/dano-2025.pdf">Финал DANO’25</a> · <a href="dano/dano-2024.pdf">Финал DANO’24</a></p>
+      <p style="padding: 0 20px">
+        <a href="https://nelkio.github.io/influence-web/">Influence Web</a> ·
+        <a href="https://nelkio.github.io/RU-Fast-Food-Locator-Game/">Фудрадар</a> ·
+        <a href="https://nelkio.github.io/hexceed-web/">Hexlume</a> ·
+        <a href="https://github.com/NELKIO/presentations">Библиотека материалов</a> ·
+        <a href="https://nelkio.github.io/WinPaint/">WinPaint</a> ·
+        <a href="https://github.com/NELKIO">GitHub</a> ·
+        <a href="dano/dano-2025.pdf">Финал DANO’25</a> ·
+        <a href="dano/dano-2024.pdf">Финал DANO’24</a>
+      </p>
     </noscript>
   </body>
 </html>
