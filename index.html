@@ -951,7 +951,8 @@
           desc: '«Влияние» в браузере: стратегия о захвате территории. Боты, дуэли, карта дня.',
           url: 'https://nelkio.github.io/influence-web/',
           repo: 'https://github.com/NELKIO/influence-web',
-          cover: 'https://nelkio.github.io/influence-web/og.png',
+          cover: 'covers/influence.jpg',
+          pos: 'center top',
         },
         {
           title: 'Фудрадар',
@@ -959,20 +960,15 @@
           url: 'https://nelkio.github.io/RU-Fast-Food-Locator-Game/',
           repo: 'https://github.com/NELKIO/RU-Fast-Food-Locator-Game',
           cover: 'covers/fudradar.jpg',
-          pos: 'center top', // phones bleed off the bottom edge, so wide cards crop from below
+          pos: 'center top', // game collages: phones bleed off the bottom edge, so wide cards crop from below
         },
         {
           title: 'Hexlume',
           desc: 'Как сапёр, только на шестиугольниках: зажги все огоньки чистой логикой, без угадывания.',
           url: 'https://nelkio.github.io/hexceed-web/',
           repo: 'https://github.com/NELKIO/hexceed-web',
-          cover: 'https://nelkio.github.io/hexceed-web/og.jpg',
-        },
-        {
-          title: 'Библиотека материалов',
-          desc: 'Мои учебные презентации',
-          url: 'https://github.com/NELKIO/presentations',
-          cover: 'covers/materials.svg',
+          cover: 'covers/hexlume.jpg',
+          pos: 'center top',
         },
         {
           title: 'WinPaint',
@@ -981,6 +977,11 @@
           repo: 'https://github.com/NELKIO/WinPaint',
           cover: 'covers/winpaint.jpg',
           pos: 'center top', // keep the ribbon in view
+        },
+        {
+          title: 'Мои презентации',
+          url: 'https://github.com/NELKIO/presentations',
+          cover: 'covers/materials.svg',
         },
       ];
       const GITHUB = { title: 'GitHub', desc: 'Код и все проекты', url: 'https://github.com/NELKIO' };
@@ -1013,7 +1014,7 @@
 
       const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
       const card = (p, alt, cover) => {
-        const inner = `${cover}<div class="body"><div><div class="title">${esc(p.title)}</div><div class="desc">${esc(p.desc)}</div></div><span class="go">${arrow}</span></div>`;
+        const inner = `${cover}<div class="body"><div><div class="title">${esc(p.title)}</div>${p.desc ? `<div class="desc">${esc(p.desc)}</div>` : ''}</div><span class="go">${arrow}</span></div>`;
         if (!p.repo) return `<a class="card${alt ? ' alt' : ''}" href="${esc(p.url)}">${inner}</a>`;
         // Links can't nest: the whole card is covered by one link (.hit), the small GitHub button sits above it.
         return `<div class="card">${inner}<a class="hit" href="${esc(p.url)}" aria-label="${esc(p.title)}"></a><a class="repo" href="${esc(p.repo)}" aria-label="${esc(p.title)}: код на GitHub">${githubMark}GitHub</a></div>`;
@@ -1066,8 +1067,8 @@
         <a href="https://nelkio.github.io/influence-web/">Influence Web</a> ·
         <a href="https://nelkio.github.io/RU-Fast-Food-Locator-Game/">Фудрадар</a> ·
         <a href="https://nelkio.github.io/hexceed-web/">Hexlume</a> ·
-        <a href="https://github.com/NELKIO/presentations">Библиотека материалов</a> ·
         <a href="https://nelkio.github.io/WinPaint/">WinPaint</a> ·
+        <a href="https://github.com/NELKIO/presentations">Мои презентации</a> ·
         <a href="https://github.com/NELKIO">GitHub</a> ·
         <a href="dano/dano-2025.pdf">Финал DANO’25</a> ·
         <a href="dano/dano-2024.pdf">Финал DANO’24</a>
