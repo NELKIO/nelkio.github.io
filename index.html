@@ -979,33 +979,13 @@
           pos: 'center top', // keep the ribbon in view
         },
         {
-          title: 'Мои презентации',
+          title: 'Библиотека материалов',
+          desc: 'Мои презентации',
           url: 'https://github.com/NELKIO/presentations',
           cover: 'covers/materials.svg',
         },
       ];
       const GITHUB = { title: 'GitHub', desc: 'Код и все проекты', url: 'https://github.com/NELKIO' };
-      // DANO final project decks (PDF in /dano), newest first: they go in their own row after GitHub.
-      const DECKS = [
-        {
-          title: 'Финал DANO’25',
-          desc: 'Проект: влияет ли цена квадратного метра на задержки сдачи новостроек в Новой Москве. Презентация, PDF',
-          url: 'dano/dano-2025.pdf',
-          cover: 'dano/dano-2025.jpg',
-          pos: 'center',
-          fit: 'contain', // the whole slide, framed by its own light-gray background
-          bg: '#f6f6f6',
-        },
-        {
-          title: 'Финал DANO’24',
-          desc: 'Проект на данных Т-Банка: как активность клиента влияет на повторные заказы в «Городе». Презентация, PDF',
-          url: 'dano/dano-2024.pdf',
-          cover: 'dano/dano-2024.jpg',
-          pos: 'center',
-          fit: 'contain', // nothing cropped; a few px of white slide background on the sides
-          bg: '#fff',
-        },
-      ];
 
       const arrow =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -1022,8 +1002,7 @@
 
       document.getElementById('grid').innerHTML =
         PROJECTS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}');background-position:${p.pos || 'center'}"></div>`)).join('') +
-        card(GITHUB, true, `<div class="cover github">${githubMark}</div>`) +
-        DECKS.map((p) => card(p, false, `<div class="cover" style="background-image:url('${esc(p.cover)}');background-position:${p.pos};background-size:${p.fit || 'cover'};background-repeat:no-repeat;background-color:${p.bg || 'transparent'}"></div>`)).join('');
+        card(GITHUB, true, `<div class="cover github">${githubMark}</div>`);
 
       // Timeline: cards fade in, the line fills up to the reading point, dots light up as it passes them.
       const tl = document.getElementById('tl');
@@ -1068,10 +1047,8 @@
         <a href="https://nelkio.github.io/RU-Fast-Food-Locator-Game/">Фудрадар</a> ·
         <a href="https://nelkio.github.io/hexceed-web/">Hexlume</a> ·
         <a href="https://nelkio.github.io/WinPaint/">WinPaint</a> ·
-        <a href="https://github.com/NELKIO/presentations">Мои презентации</a> ·
-        <a href="https://github.com/NELKIO">GitHub</a> ·
-        <a href="dano/dano-2025.pdf">Финал DANO’25</a> ·
-        <a href="dano/dano-2024.pdf">Финал DANO’24</a>
+        <a href="https://github.com/NELKIO/presentations">Библиотека материалов</a> ·
+        <a href="https://github.com/NELKIO">GitHub</a>
       </p>
     </noscript>
   </body>
